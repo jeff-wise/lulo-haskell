@@ -1,6 +1,14 @@
+
+{-| Application Entry Point
+-}
+
+
 module Main where
 
-import Lib
+
+import qualified Lulo.CLI as CLI
+
+
 
 main :: IO ()
-main = someFunc
+main = CLI.run

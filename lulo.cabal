@@ -14,10 +14,18 @@ extra-source-files:  README.md
 cabal-version:       >=1.10
 
 library
-  hs-source-dirs:      src
-  exposed-modules:     Lib
-  build-depends:       base >= 4.7 && < 5
-  default-language:    Haskell2010
+  hs-source-dirs:       src
+  exposed-modules:      Lulo
+                        Lulo.CLI
+  other-modules:        Lulo.Types
+                        Lulo.Parse
+  build-depends:        base >= 4.7 && < 5
+                      , aeson
+                      , optparse-applicative
+                      , text
+                      , unordered-containers
+                      , yaml
+  default-language:     Haskell2010
 
 executable lulo-exe
   hs-source-dirs:      app
