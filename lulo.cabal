@@ -17,10 +17,14 @@ library
   hs-source-dirs:       src
   exposed-modules:      Lulo
                         Lulo.CLI
-  other-modules:        Lulo.Types
+  other-modules:        Lulo.HTML
                         Lulo.Parse
+                        Lulo.Types
   build-depends:        base >= 4.7 && < 5
                       , aeson
+                      , blaze-html
+                      , bytestring
+                      , lens
                       , optparse-applicative
                       , text
                       , unordered-containers
