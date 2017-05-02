@@ -30,9 +30,10 @@ import qualified Data.Yaml as YAML
 --------------------------------------------------------------------------------
 
 data Parameters = Parameters 
-  { _parametersSpecFilename :: FilePath 
-  , _parametersVerbosity    :: Verbosity
-  , _parametersHtmlFilename :: Maybe FilePath
+  { _parametersSpecFilename   :: FilePath 
+  , _parametersVerbosity      :: Verbosity
+  , _parametersHtmlFilename   :: Maybe FilePath
+  , _parametersHtmlFilePretty :: Bool
   }
 
 

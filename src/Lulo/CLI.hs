@@ -6,10 +6,11 @@
 module Lulo.CLI where
 
 
-import Lulo.HTML (indexHTML)
+import Lulo.HTML (specHTML)
 import Lulo.Parse (parseSpecFile)
 import Lulo.Types (
-    Parameters (..), specFilename, verbosity, htmlFilename
+    Parameters (..)
+  , specFilename, verbosity, htmlFilename, htmlFilePretty
   , Verbosity (..)
   , Spec
   )
@@ -21,6 +22,7 @@ import qualified Data.ByteString.Lazy as BL
 import Data.Monoid ((<>))
 import Data.Text (Text)
 
+import qualified Text.Blaze.Html.Renderer.Pretty as Pretty (renderHtml)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
 
 import Options.Applicative
@@ -69,6 +71,9 @@ parameterParser = Parameters
                     (  long "html"
                     <> metavar "HTML"
                     <> help "The file path of the generated HTML file." ) )
+              <*> switch
+                  (  long "html-pretty" 
+                  <> help "Output pretty printed HTML." )
 
 
 -- PARSE FILE
@@ -79,26 +84,30 @@ parseSpec parameters = do
   let isVerbose = (parameters ^. verbosity) == Verbose
   mSpec <- parseSpecFile (parameters ^. specFilename)
   case mSpec of
-    Just spec -> processSpec spec (parameters ^. htmlFilename) isVerbose
+    Just spec -> processSpec spec parameters
     Nothing   -> 
       when isVerbose $ 
         putStrLn $ "Could not be parse " <> (parameters ^. specFilename)
 
 
-processSpec :: Spec -> Maybe FilePath -> Bool -> IO ()
-processSpec spec mHTMLFilename isVerbose = do
+processSpec :: Spec -> Parameters -> IO ()
+processSpec spec parameters = do
+  let isVerbose = (parameters ^. verbosity) == Verbose
   -- Show message
   when isVerbose $
     putStrLn "Spec parsed successfully."
   -- HTML generation
-  case mHTMLFilename of
-    Just htmlFilename -> 
-      generateHTMLFile spec htmlFilename
+  case (parameters ^. htmlFilename) of
+    Just filename -> 
+      generateHTMLFile spec filename parameters
     Nothing           -> 
       when isVerbose $
         putStrLn "No HTML file name provided. None will be generated."
 
 
-generateHTMLFile :: Spec -> FilePath -> IO () 
-generateHTMLFile spec filename = do
-  BL.writeFile filename $ renderHtml $ indexHTML spec
+generateHTMLFile :: Spec -> FilePath -> Parameters -> IO () 
+generateHTMLFile spec filename parameters = do
+  if (parameters ^. htmlFilePretty)
+     then writeFile filename $ Pretty.renderHtml $ specHTML spec
+     else BL.writeFile filename $ renderHtml $ specHTML spec
+
