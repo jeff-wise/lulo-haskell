@@ -10,7 +10,7 @@ import Lulo.HTML (specHTML)
 import Lulo.Parse (parseSpecFile)
 import Lulo.Types (
     Parameters (..)
-  , specFilename, verbosity, htmlFilename, htmlFilePretty
+  , specFilename, verbosity, htmlFilename, htmlFilePretty, cssFilename
   , Verbosity (..)
   , Spec
   )
@@ -71,6 +71,10 @@ parameterParser = Parameters
                     (  long "html"
                     <> metavar "HTML"
                     <> help "The file path of the generated HTML file." ) )
+              <*> (optional $ strOption
+                    (  long "css"
+                    <> metavar "CSS"
+                    <> help "The file path of a CSS file for the HTML file." ) )
               <*> switch
                   (  long "html-pretty" 
                   <> help "Output pretty printed HTML." )
@@ -107,7 +111,9 @@ processSpec spec parameters = do
 
 generateHTMLFile :: Spec -> FilePath -> Parameters -> IO () 
 generateHTMLFile spec filename parameters = do
-  if (parameters ^. htmlFilePretty)
-     then writeFile filename $ Pretty.renderHtml $ specHTML spec
-     else BL.writeFile filename $ renderHtml $ specHTML spec
+  let mCSSFilePath = (parameters ^. cssFilename) 
+  case (parameters ^. htmlFilePretty) of
+    True -> writeFile filename $ 
+              Pretty.renderHtml $ specHTML spec mCSSFilePath
+    False -> BL.writeFile filename $ renderHtml $ specHTML spec mCSSFilePath
 

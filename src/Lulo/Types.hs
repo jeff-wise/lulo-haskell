@@ -3,6 +3,7 @@
 -}
 
 
+{-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
 {-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
@@ -13,13 +14,23 @@
 module Lulo.Types where
 
 
+import Control.Applicative ((<|>))
+import Control.Lens
 import Control.Lens.TH (makeFields)
 
 import qualified Data.Aeson.Types as YAML
+import Data.Foldable (foldl')
+import Data.Hashable
+import qualified Data.HashMap.Lazy as HML
+import Data.HashMap.Lazy (HashMap)
 import Data.HashSet (HashSet)
-import Data.Text
+import Data.Maybe (maybeToList)
+import Data.Text (Text)
+import qualified Data.Text as T
 import Data.Yaml ((.:), (.:?), Parser, FromJSON, parseJSON)
 import qualified Data.Yaml as YAML
+
+import GHC.Generics (Generic)
 
 
 
@@ -33,6 +44,7 @@ data Parameters = Parameters
   { _parametersSpecFilename   :: FilePath 
   , _parametersVerbosity      :: Verbosity
   , _parametersHtmlFilename   :: Maybe FilePath
+  , _parametersCssFilename    :: Maybe FilePath
   , _parametersHtmlFilePretty :: Bool
   }
 
@@ -46,25 +58,38 @@ data Verbosity =
 -- SPECIFICATION
 --------------------------------------------------------------------------------
 
--- ** Spec
---------------------------------------------------------------------------------
-
 data Spec = Spec
-  { _specVersion     :: SpecVersion
-  , _specTypes       :: [ObjectType]
-  , _specConstraints :: [Constraint]
+  { _specVersion         :: SpecVersion
+  , _specTypes           :: [ObjectType]
+  , _specConstraintIndex :: HashMap ConstraintName ValueConstraint
   }
 
 
 instance FromJSON Spec where
-  parseJSON (YAML.Object o) = Spec
-                          <$> o .: "version"
-                          <*> o .: "types"
-                          <*> o .: "constraints"
+  parseJSON (YAML.Object o) = do
+    version <- o .: "version"
+    typeList <- o .: "types"
+    constList <- o .: "constraints" :: Parser [ValueConstraint] 
+    let constIndex = newConstraintIndex constList
+    return $ Spec version typeList constIndex 
   parseJSON invalid    = YAML.typeMismatch "Spec" invalid
 
 
--- ** Spec Version
+newConstraintIndex :: [ValueConstraint] -> HashMap ConstraintName ValueConstraint
+newConstraintIndex = foldl' indexConstraint HML.empty
+  where
+    indexConstraint hm c = 
+      let cName = (_commonConstraintDataName $ _valueConstraintCommon c)
+      in  HML.insert cName c hm
+
+
+specConstraint :: Spec -> ConstraintName -> Maybe ValueConstraint
+specConstraint spec constraintName =
+      builtInConstraint constraintName
+  <|> HML.lookup constraintName (_specConstraintIndex spec)
+
+
+-- Specification > Version
 --------------------------------------------------------------------------------
 
 newtype SpecVersion = SpecVersion
@@ -76,20 +101,14 @@ instance FromJSON SpecVersion where
   parseJSON invalid           = YAML.typeMismatch "SpecVersion" invalid
 
 
--- TYPE
---------------------------------------------------------------------------------
 
--- ** Type
+-- OBJECT TYPE
 --------------------------------------------------------------------------------
 
 data ObjectType = ObjectType 
   { _objectTypeCommon   :: CommonTypeData
   , _objectTypeTypeData :: TypeData
   }
-
-data TypeData = 
-    Product ProductType
-  | Sum SumType
 
 
 instance FromJSON ObjectType where
@@ -105,7 +124,15 @@ instance FromJSON ObjectType where
   parseJSON invalid    = YAML.typeMismatch "ObjectType" invalid 
 
 
--- ** General Type Data
+-- ObjectType > Type Data
+--------------------------------------------------------------------------------
+
+data TypeData = 
+    Product ProductType
+  | Sum SumType
+
+
+-- Object Type > Common Type Data
 --------------------------------------------------------------------------------
 
 data CommonTypeData = CommonTypeData
@@ -123,44 +150,33 @@ instance FromJSON CommonTypeData where
   parseJSON invalid    = YAML.typeMismatch "CommonTypeData" invalid
 
 
--- ** Presence
+-- PRODUCT TYPE
 --------------------------------------------------------------------------------
 
-data Presence = Optional | Required
-
-instance FromJSON Presence where
-  parseJSON (YAML.String s) = case s of
-                                "optional" -> return Optional
-                                "required" -> return Required
-  parseJSON invalid     = YAML.typeMismatch "Presence" invalid
-
-
--- > Product Type
---------------------------------------------------------------------------------
-
--- ** Product Type
+-- Product Type
 --------------------------------------------------------------------------------
 
 data ProductType = ProductType
-  { _productTypeCommon :: CommonTypeData 
-  , _productTypeFields :: [Field]
+  { _productTypeFields :: [Field]
   }
 
 
 instance FromJSON ProductType where
   parseJSON obj@(YAML.Object hm) = ProductType 
-                               <$> parseJSON obj
-                               <*> hm .: "fields"
+                               <$> hm .: "fields"
   parseJSON invalid         = YAML.typeMismatch "ProductType" invalid
 
 
--- ** Field
+-- ProductType > Field
 --------------------------------------------------------------------------------
 
 data Field = Field
-  { _fieldName      :: FieldName
-  , _fieldPresence  :: Presence
-  , _fieldValueType :: ValueType  
+  { _fieldName         :: FieldName
+  , _fieldPresence     :: Presence
+  , _fieldDescription  :: Maybe FieldDescription
+  , _fieldValueType    :: ValueType  
+  , _fieldConstraints  :: [ConstraintName]
+  , _fieldDefaultValue :: Maybe FieldDefaultValue
   }
 
 
@@ -168,11 +184,15 @@ instance FromJSON Field where
   parseJSON obj@(YAML.Object m) = Field 
                               <$> m .: "name"
                               <*> m .: "presence"
+                              <*> m .:? "description"
                               <*> parseJSON obj
+                              <*> (concat . maybeToList <$> m .:? "constraints")
+                              <*> m .:? "default_value"
   parseJSON invalid         = YAML.typeMismatch "Field" invalid
 
 
--- ** Field Name
+
+-- ProductType > Field > Name
 --------------------------------------------------------------------------------
 
 newtype FieldName = FieldName
@@ -184,51 +204,103 @@ instance FromJSON FieldName where
   parseJSON invalid         = YAML.typeMismatch "FieldName" invalid
 
 
--- > Sum Type
+-- ProductType > Field > Description
 --------------------------------------------------------------------------------
 
--- ** Sum Type
+newtype FieldDescription = FieldDescription
+  { unFieldDesc :: Text }
+
+
+instance FromJSON FieldDescription where
+  parseJSON (YAML.String s) = return $ FieldDescription s
+  parseJSON invalid         = YAML.typeMismatch "FieldDescription" invalid
+
+
+-- ProductType > Field > Default Value
+--------------------------------------------------------------------------------
+
+newtype FieldDefaultValue = FieldDefaultValue
+  { unFieldDefaultValue :: Text }
+
+
+instance FromJSON FieldDefaultValue where
+  parseJSON (YAML.String s) = return $ FieldDefaultValue s
+  parseJSON invalid         = YAML.typeMismatch "FieldDefaultValue" invalid
+
+
+-- ProductType > Field > Presence
+--------------------------------------------------------------------------------
+
+data Presence = 
+    Optional 
+  | Required
+  deriving (Show)
+
+
+instance FromJSON Presence where
+  parseJSON (YAML.String s) = case s of
+                                "optional" -> return Optional
+                                "required" -> return Required
+  parseJSON invalid     = YAML.typeMismatch "Presence" invalid
+
+
+-- SUM TYPE
+--------------------------------------------------------------------------------
+
+-- Sum Type
 --------------------------------------------------------------------------------
 
 data SumType = SumType
-  { _sumTypeCommon :: CommonTypeData 
-  , _sumTypeCases  :: [Case]
+  { _sumTypeCases  :: [SumCase]
   }
 
 
 instance FromJSON SumType where
   parseJSON obj@(YAML.Object hm) = SumType 
-                               <$> parseJSON obj
-                               <*> hm .: "cases"
-  parseJSON invalid         = YAML.typeMismatch "SumType" invalid
+                               <$> hm .: "cases"
+  parseJSON invalid              = YAML.typeMismatch "SumType" invalid
 
 
 -- ** Sum Type
 --------------------------------------------------------------------------------
 
-data Case = Case
-  { _caseName      :: CaseName 
-  , _caseValueType :: ValueType  
+data SumCase = SumCase
+  { _sumCaseName        :: SumCaseName 
+  , _sumCaseDescription :: Maybe SumCaseDescription
+  , _sumCaseValueType   :: ValueType  
   }
 
 
-instance FromJSON Case where
-  parseJSON obj@(YAML.Object m) = Case 
-                              <$> m .: "name" 
-                              <*> parseJSON obj
-  parseJSON invalid             = YAML.typeMismatch "Case" invalid
+instance FromJSON SumCase where
+  parseJSON obj@(YAML.Object hm) = SumCase 
+                               <$> hm .: "name" 
+                               <*> hm .:? "description" 
+                               <*> parseJSON obj
+  parseJSON invalid             = YAML.typeMismatch "SumCase" invalid
 
 
 -- ** Case Name
 --------------------------------------------------------------------------------
 
-newtype CaseName = CaseName
-  { unCaseName :: Text }
+newtype SumCaseName = SumCaseName
+  { unSumCaseName :: Text }
 
 
-instance FromJSON CaseName where
-  parseJSON (YAML.String s) = return $ CaseName s
-  parseJSON invalid         = YAML.typeMismatch "CaseName" invalid
+instance FromJSON SumCaseName where
+  parseJSON (YAML.String s) = return $ SumCaseName s
+  parseJSON invalid         = YAML.typeMismatch "SumCaseName" invalid
+
+
+-- ** Sum Case Description
+--------------------------------------------------------------------------------
+
+newtype SumCaseDescription = SumCaseDescription
+  { unSumCaseDesc :: Text }
+
+
+instance FromJSON SumCaseDescription where
+  parseJSON (YAML.String s) = return $ SumCaseDescription s
+  parseJSON invalid         = YAML.typeMismatch "SumCaseDescription" invalid
 
 
 -- VALUE TYPE
@@ -244,12 +316,28 @@ data ValueType =
   | Prim PrimValueType
 
 
+instance Show ValueType where
+  show (Custom (CustomTypeName typeName))         = T.unpack typeName
+  show (PrimList primValueType)                   = 
+    show primValueType ++ " list"
+  show (CustomTypeList (CustomTypeName typeName)) = T.unpack typeName ++ " list"
+  show (Prim primValueType)                       = show primValueType
+
+
 data PrimValueType = 
     Any
   | Number
   | StringAlphaNumUnderscore
   | StringUtf8
   | Boolean
+
+
+instance Show PrimValueType where
+  show Any                      = "any"
+  show Number                   = "number"
+  show StringAlphaNumUnderscore = "alphanumeric string with underscores"
+  show StringUtf8               = "UTF-8 string"
+  show Boolean                  = "true/false"
 
 
 instance FromJSON ValueType where
@@ -298,26 +386,43 @@ instance FromJSON CustomTypeName where
   parseJSON invalid         = YAML.typeMismatch "CustomTypeName" invalid
 
 
--- CONSTRAINT
+-- CONSTRAINTS
 --------------------------------------------------------------------------------
+
+-- ** Value Constraint
+--------------------------------------------------------------------------------
+
+data ValueConstraint = ValueConstraint
+  { _valueConstraintCommon     :: CommonConstraintData
+  , _valueConstraintConstraint :: Constraint
+  }
+
+
+instance FromJSON ValueConstraint where
+  parseJSON obj@(YAML.Object m) = ValueConstraint 
+                              <$> parseJSON obj
+                              <*> parseJSON obj
+  parseJSON invalid    = YAML.typeMismatch "ValueConstraint" invalid 
+
 
 -- ** Constraint
 --------------------------------------------------------------------------------
 
-data Constraint = 
+data Constraint =
     StringOneOf StringOneOfConstraint
   | NumGreaterThan NumberGreaterThanConstraint
-    
+
 
 instance FromJSON Constraint where
-  parseJSON obj@(YAML.Object m) = do
+  parseJSON (YAML.Object m) = do 
     typeString <- m .: "type" :: Parser Text
+    paramtersValue <- m .: "parameters" :: Parser YAML.Value
     case typeString of
-      "string_one_of"       -> StringOneOf <$> parseJSON obj
-      "number_greater_than" -> NumGreaterThan <$> parseJSON obj
-  parseJSON invalid         = YAML.typeMismatch "Constraint" invalid 
+      "string_one_of"       -> StringOneOf <$> parseJSON paramtersValue
+      "number_greater_than" -> NumGreaterThan <$> parseJSON paramtersValue
+  parseJSON invalid         = YAML.typeMismatch "CommonConstraintData" invalid 
 
-
+    
 -- ** General Constraint Data
 --------------------------------------------------------------------------------
 
@@ -339,6 +444,10 @@ instance FromJSON CommonConstraintData where
 
 newtype ConstraintName = ConstraintName
   { unConstraintName :: Text }
+  deriving (Eq, Generic)
+
+
+instance Hashable ConstraintName
 
 
 instance FromJSON ConstraintName where
@@ -362,32 +471,49 @@ instance FromJSON ConstraintDescription where
 --------------------------------------------------------------------------------
 
 data StringOneOfConstraint = StringOneOfConstraint
-  { _stringOneOfConstraintCommon :: CommonConstraintData
-  , _stringOneOfConstraintSet    :: HashSet String 
+  { _stringOneOfConstraintSet :: HashSet Text
   }
 
 
 instance FromJSON StringOneOfConstraint where
   parseJSON obj@(YAML.Object m) = StringOneOfConstraint
-                              <$> parseJSON obj
-                              <*> m .: "set" 
+                              <$> m .: "set" 
   parseJSON invalid         = YAML.typeMismatch "StringOneOfConstraint" invalid 
 
 
 -- > GREATER THAN
 --------------------------------------------------------------------------------
 
+-- Lower Bound is Exclusive
 data NumberGreaterThanConstraint = NumberGreaterThanConstraint
-  { _numberGreaterThanConstraintCommon           :: CommonConstraintData
-  , _numberGreaterThanConstraintCommonLowerBound :: Double
+  { _numberGreaterThanConstraintLowerBound :: Double
   }
 
 
 instance FromJSON NumberGreaterThanConstraint where
   parseJSON obj@(YAML.Object m) = NumberGreaterThanConstraint
-                              <$> parseJSON obj
-                              <*> m .: "greater_than" 
+                              <$> m .: "greater_than" 
   parseJSON invalid         = YAML.typeMismatch "NumberGreaterThanConstraint" invalid 
+
+
+
+-- > BUILT-IN CONSTRAINTS
+--------------------------------------------------------------------------------
+
+builtInConstraint :: ConstraintName -> Maybe ValueConstraint
+builtInConstraint (ConstraintName constraintName) =
+  case constraintName of
+    "positive_integer" -> Just positiveIntegerConstraint
+    _                  -> Nothing
+
+
+positiveIntegerConstraint :: ValueConstraint
+positiveIntegerConstraint = 
+  ValueConstraint
+    (CommonConstraintData 
+      (ConstraintName $ T.pack "Positive Integer") 
+      (Just $ ConstraintDescription $ T.pack "Any integer i > 0"))
+    (NumGreaterThan $ NumberGreaterThanConstraint 0)
 
 
 -- MAKE LENSES
@@ -397,3 +523,11 @@ makeFields ''Parameters
 makeFields ''Spec
 makeFields ''ObjectType
 makeFields ''CommonTypeData
+makeFields ''ProductType
+makeFields ''Field
+makeFields ''SumType
+makeFields ''SumCase
+makeFields ''ValueConstraint
+makeFields ''CommonConstraintData
+makeFields ''StringOneOfConstraint
+makeFields ''NumberGreaterThanConstraint

@@ -24,6 +24,7 @@ library
                       , aeson
                       , blaze-html
                       , bytestring
+                      , hashable
                       , lens
                       , optparse-applicative
                       , text
