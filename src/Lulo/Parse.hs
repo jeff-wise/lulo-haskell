@@ -8,6 +8,7 @@ module Lulo.Parse where
 
 
 import Lulo.Types
+import Lulo.Types.Spec.JSON
 
 import Data.Yaml as YAML (ParseException (..))
 import qualified Data.Yaml as YAML (decodeFileEither)

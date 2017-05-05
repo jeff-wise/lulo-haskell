@@ -20,6 +20,7 @@ library
   other-modules:        Lulo.HTML
                         Lulo.Parse
                         Lulo.Types
+                        Lulo.Types.Spec.JSON
   build-depends:        base >= 4.7 && < 5
                       , aeson
                       , blaze-html

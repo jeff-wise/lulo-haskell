@@ -22,6 +22,7 @@ import Control.Monad (forM_, mapM_, when)
 import Data.Char (toLower)
 import Data.Foldable (null)
 import Data.Maybe (catMaybes)
+import qualified Data.HashMap.Lazy as HML (toList)
 import Data.Text (Text)
 import qualified Data.Text as T
 
@@ -44,11 +45,12 @@ specHTML spec mCSSFilePath =
                                    ! A.type_ "text/css" 
                                    ! (A.href $ toValue cssFilePath)
         Nothing          -> return ()   
+      H.link ! A.href "https://fonts.googleapis.com/css?family=Open+Sans"
+             ! A.rel "stylesheet"
     H.body $ do 
       H.div ! A.id "specification" $ do
-        H.div ! A.id "index-container" $ indexHTML spec
-        H.div ! A.id "tell-container" $ tellHTML spec
-        H.div ! A.id "show-container" $ showHTML spec
+        H.div ! A.id "sidebar" $ indexHTML spec
+        H.div ! A.id "content" $ contentHTML spec
 
 
 -- INDEX
@@ -65,17 +67,26 @@ indexContentHTML spec =
   indexTypesSectionHTML (spec ^. types)
 
 
--- INDEX > SECTIONS
+-- Index > Sections
 --------------------------------------------------------------------------------
 
--- ** Types Section
+-- Index > Sections > Types
 --------------------------------------------------------------------------------
 
 indexTypesSectionHTML :: [ObjectType] -> Html
 indexTypesSectionHTML types = do
   indexSectionHeaderHTML "Types"
-  H.ul ! A.id "index-types" $ 
-    indexTypeLinkListItemsHTML types
+  let typesByGroupList = HML.toList $ groupToTypeMap types
+  H.div ! A.id "index-types" $ 
+    forM_ typesByGroupList (uncurry indexTypesGroupHTML)
+
+
+indexTypesGroupHTML :: Text -> [ObjectType] -> Html
+indexTypesGroupHTML groupName objectTypes = do
+  indexSectionSubHeaderHTML groupName
+  H.ul ! (A.class_ $ toValue groupName) $
+    indexTypeLinkListItemsHTML objectTypes
+
 
 indexTypeLinkListItemsHTML :: [ObjectType] -> Html
 indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
@@ -88,10 +99,10 @@ indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
                             ('#' `T.cons` (objectType ^. common.name))
 
 
--- INDEX > COMPONENTS
+-- > INDEX COMPONENTS
 --------------------------------------------------------------------------------
 
--- ** Link
+-- Index Components > Link
 --------------------------------------------------------------------------------
 
 indexLinkHTML :: Text -> Text -> Html 
@@ -100,56 +111,69 @@ indexLinkHTML linkName linkHref =
       ! (A.href $ toValue linkHref)
       $ toHtml linkName 
 
--- ** Header
+
+-- Index Components > Headers
 --------------------------------------------------------------------------------
 
 indexSectionHeaderHTML :: Text -> Html
 indexSectionHeaderHTML headerText = H.h5 $ toHtml headerText
 
 
--- TELL
+indexSectionSubHeaderHTML :: Text -> Html
+indexSectionSubHeaderHTML subheaderText = H.h6 $ toHtml subheaderText
+
+
+-- CONTENT
 --------------------------------------------------------------------------------
 
-tellHTML :: Spec -> Html
-tellHTML spec = containerHTML $ tellContentHTML spec
-  where
-    containerHTML :: Html -> Html
-    containerHTML = H.div ! A.id "tell"
+-- | The HTML for the content section which is the majority of the document 
+-- (everything to the right sidebar)
+contentHTML :: Spec -> Html
+contentHTML spec = typesSectionHTML spec
 
 
-tellContentHTML :: Spec -> Html
-tellContentHTML spec = do
-  tellTypesSectionHTML spec
+typesSectionHTML :: Spec -> Html
+typesSectionHTML spec = 
+  H.div ! A.id "types" $ 
+    forM_ (spec ^. types) $ typeContainerHTML spec
 
 
-tellTypesSectionHTML :: Spec -> Html
-tellTypesSectionHTML spec = 
-  containerHTML $ forM_ (spec ^. types) $ 
-                    tellTypeHTML spec
-  where
-    containerHTML :: Html -> Html
-    containerHTML = H.div ! A.id "types"
+typeContainerHTML :: Spec -> ObjectType -> Html
+typeContainerHTML spec objectType = do
+  H.div ! A.class_ "type" $ do
+    H.div ! A.class_ "definition" $ typeHTML spec objectType
+    H.div ! A.class_ "example" $ typeExampleHTML
 
 
--- > TYPE
+-- TYPE
 --------------------------------------------------------------------------------
 
-tellTypeHTML :: Spec -> ObjectType -> Html
-tellTypeHTML spec objectType = do
+-- | The HTML represention for a Type
+typeHTML :: Spec -> ObjectType -> Html
+typeHTML spec objectType = do
   -- Header
-  H.h2 (toHtml $ objectType ^. common.label)
+  typeHeaderHTML (objectType ^. common.label)
   -- Description
-  case (objectType ^. common.description) of
-    Just desc -> H.p ! A.class_ "description" $ toHtml desc
-    Nothing   -> return ()
+  typeDescriptionHTML (objectType ^. common.description)
   -- Fields / Cases
   case (objectType ^. typeData) of
-    Product productType -> tellTypeFieldsHTML spec productType
-    Sum     sumType     -> tellTypeCasesHTML sumType
+    Product productType -> typeFieldsHTML spec productType
+    Sum     sumType     -> typeCasesHTML sumType
+
+
+typeHeaderHTML :: Text -> Html
+typeHeaderHTML label =
+  H.h2 $ toHtml label
+
+
+typeDescriptionHTML :: Maybe Text -> Html
+typeDescriptionHTML (Just desc) = 
+  H.p ! A.class_ "description" $ toHtml desc
+typeDescriptionHTML Nothing     = return ()
    
 
-tellTypeFieldsHTML :: Spec -> ProductType -> Html
-tellTypeFieldsHTML spec productType = do
+typeFieldsHTML :: Spec -> ProductType -> Html
+typeFieldsHTML spec productType = do
   H.div ! A.class_ "fields" $ do
     H.h3 "Fields"
     H.ul $ forM_ (productType ^. fields) (fieldListItemHTML spec)
@@ -159,7 +183,7 @@ fieldListItemHTML :: Spec -> Field -> Html
 fieldListItemHTML spec = H.li . fieldHTML spec
 
 
--- > FIELD
+-- Type > Field
 --------------------------------------------------------------------------------
 
 fieldHTML :: Spec -> Field -> Html
@@ -211,7 +235,7 @@ fieldDefaultValueHTML (Just (FieldDefaultValue defaultValue)) =
 fieldDefaultValueHTML Nothing                                 = return ()
 
 
--- > CONSTRAINT
+-- Type > Field > Constraint
 --------------------------------------------------------------------------------
 
 fieldConstraintsHTML :: [ConstraintName] -> Spec -> Html
@@ -234,26 +258,18 @@ fieldConstraintHTML valueConstraint =
     NumGreaterThan c -> numGreaterThanConstraintHTML c
 
 
-stringOneOfConstraintHTML :: StringOneOfConstraint -> Html
-stringOneOfConstraintHTML oneOf = do
-  H.div ! A.class_ "constraint-string-one-of" $ do
-    H.span "Must be one of"
-    forM_ (oneOf ^. set) $ 
-      (H.span ! A.class_ "choice") . toHtml
+-- Type > Example
+--------------------------------------------------------------------------------
 
-
-numGreaterThanConstraintHTML :: NumberGreaterThanConstraint -> Html
-numGreaterThanConstraintHTML greaterThan = 
-  H.div ! A.class_ "constraint-number-greater-than" $ do
-    H.span "> "
-    H.span $ toHtml (greaterThan ^. lowerBound)
+typeExampleHTML :: Html
+typeExampleHTML = H.span "example"
 
 
 -- > CASE
 --------------------------------------------------------------------------------
 
-tellTypeCasesHTML :: SumType -> Html
-tellTypeCasesHTML sumType = do
+typeCasesHTML :: SumType -> Html
+typeCasesHTML sumType = do
   H.div ! A.class_ "cases" $ do
     H.h3 "Cases"
     H.ul $ forM_ (sumType ^. cases) caseListItemHTML
@@ -279,17 +295,21 @@ caseHTML sumCase = do
     Nothing              -> return ()
 
 
--- SHOW
+-- CONSTRAINTS
 --------------------------------------------------------------------------------
 
-showHTML :: Spec -> Html
-showHTML spec = showDivHTML $ showContentHTML spec
-  where
-    showDivHTML :: Html -> Html
-    showDivHTML = H.div ! A.id "show"
+stringOneOfConstraintHTML :: StringOneOfConstraint -> Html
+stringOneOfConstraintHTML oneOf = do
+  H.div ! A.class_ "constraint-string-one-of" $ do
+    H.span "Must be one of"
+    forM_ (oneOf ^. set) $ 
+      (H.span ! A.class_ "choice") . toHtml
 
 
-showContentHTML :: Spec -> Html
-showContentHTML spec = H.h1 "Show"
+numGreaterThanConstraintHTML :: NumberGreaterThanConstraint -> Html
+numGreaterThanConstraintHTML greaterThan = 
+  H.div ! A.class_ "constraint-number-greater-than" $ do
+    H.span "> "
+    H.span $ toHtml (greaterThan ^. lowerBound)
 
 
