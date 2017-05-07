@@ -17,7 +17,7 @@ module Lulo.HTML (
 import Lulo.Types
 
 import Control.Lens ((^.))
-import Control.Monad (forM_, mapM_, when)
+import Control.Monad (forM_, mapM_, unless)
 
 import Data.Char (toLower)
 import Data.Foldable (null)
@@ -43,11 +43,12 @@ specHTML spec mCSSFilePath =
       case mCSSFilePath of
         Just cssFilePath -> H.link ! A.rel "stylesheet" 
                                    ! A.type_ "text/css" 
-                                   ! (A.href $ toValue cssFilePath)
+                                   ! A.href (toValue cssFilePath)
         Nothing          -> return ()   
-      H.link ! A.href "https://fonts.googleapis.com/css?family=Open+Sans"
+      H.link ! A.href "https://fonts.googleapis.com/css?family=Lato"
              ! A.rel "stylesheet"
-    H.body $ do 
+      -- H.link ! A.href "https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"
+    H.body $
       H.div ! A.id "specification" $ do
         H.div ! A.id "sidebar" $ indexHTML spec
         H.div ! A.id "content" $ contentHTML spec
@@ -74,9 +75,9 @@ indexContentHTML spec =
 --------------------------------------------------------------------------------
 
 indexTypesSectionHTML :: [ObjectType] -> Html
-indexTypesSectionHTML types = do
+indexTypesSectionHTML objecTypes = do
   indexSectionHeaderHTML "Types"
-  let typesByGroupList = HML.toList $ groupToTypeMap types
+  let typesByGroupList = HML.toList $ groupToTypeMap objecTypes
   H.div ! A.id "index-types" $ 
     forM_ typesByGroupList (uncurry indexTypesGroupHTML)
 
@@ -84,7 +85,7 @@ indexTypesSectionHTML types = do
 indexTypesGroupHTML :: Text -> [ObjectType] -> Html
 indexTypesGroupHTML groupName objectTypes = do
   indexSectionSubHeaderHTML groupName
-  H.ul ! (A.class_ $ toValue groupName) $
+  H.ul ! A.class_ (toValue groupName) $
     indexTypeLinkListItemsHTML objectTypes
 
 
@@ -108,7 +109,7 @@ indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
 indexLinkHTML :: Text -> Text -> Html 
 indexLinkHTML linkName linkHref =
   H.a ! A.class_ "index-link" 
-      ! (A.href $ toValue linkHref)
+      ! A.href (toValue linkHref)
       $ toHtml linkName 
 
 
@@ -129,7 +130,7 @@ indexSectionSubHeaderHTML subheaderText = H.h6 $ toHtml subheaderText
 -- | The HTML for the content section which is the majority of the document 
 -- (everything to the right sidebar)
 contentHTML :: Spec -> Html
-contentHTML spec = typesSectionHTML spec
+contentHTML = typesSectionHTML
 
 
 typesSectionHTML :: Spec -> Html
@@ -139,7 +140,7 @@ typesSectionHTML spec =
 
 
 typeContainerHTML :: Spec -> ObjectType -> Html
-typeContainerHTML spec objectType = do
+typeContainerHTML spec objectType =
   H.div ! A.class_ "type" $ do
     H.div ! A.class_ "definition" $ typeHTML spec objectType
     H.div ! A.class_ "example" $ typeExampleHTML
@@ -156,14 +157,13 @@ typeHTML spec objectType = do
   -- Description
   typeDescriptionHTML (objectType ^. common.description)
   -- Fields / Cases
-  case (objectType ^. typeData) of
+  case objectType ^. typeData of
     Product productType -> typeFieldsHTML spec productType
     Sum     sumType     -> typeCasesHTML sumType
 
 
 typeHeaderHTML :: Text -> Html
-typeHeaderHTML label =
-  H.h2 $ toHtml label
+typeHeaderHTML = H.h2 . toHtml
 
 
 typeDescriptionHTML :: Maybe Text -> Html
@@ -173,7 +173,7 @@ typeDescriptionHTML Nothing     = return ()
    
 
 typeFieldsHTML :: Spec -> ProductType -> Html
-typeFieldsHTML spec productType = do
+typeFieldsHTML spec productType =
   H.div ! A.class_ "fields" $ do
     H.h3 "Fields"
     H.ul $ forM_ (productType ^. fields) (fieldListItemHTML spec)
@@ -205,33 +205,33 @@ fieldHTML spec field = do
 fieldNameHTML :: FieldName -> Html
 fieldNameHTML fieldName = 
   H.h4 ! A.class_ "field-name" $ 
-    (toHtml $ unFieldName fieldName)
+    toHtml (unFieldName fieldName)
 
 
 fieldPresenceHTML :: Presence -> Html
 fieldPresenceHTML fieldPresence = 
   H.div ! A.class_ "field-presence" $ 
-    (toHtml $ map toLower $ show fieldPresence)
+    toHtml (map toLower $ show fieldPresence)
 
 
 fieldTypeHTML :: ValueType -> Html
 fieldTypeHTML fieldType = 
   H.div ! A.class_ "field-type" $ 
-    (toHtml $ map toLower $ show fieldType)
+    toHtml (map toLower $ show fieldType)
 
 
 fieldDescriptionHTML :: Maybe FieldDescription -> Html
 fieldDescriptionHTML (Just fieldDescription) = 
-  H.div ! A.class_ "field-description" $ do
-    H.p $ toHtml $ unFieldDesc fieldDescription
+  H.div ! A.class_ "field-description" $
+    H.p (toHtml $ unFieldDesc fieldDescription)
 fieldDescriptionHTML Nothing                 = return ()
 
 
 fieldDefaultValueHTML :: Maybe FieldDefaultValue -> Html
-fieldDefaultValueHTML (Just (FieldDefaultValue defaultValue)) =
+fieldDefaultValueHTML (Just (FieldDefaultValue defValue)) =
   H.div ! A.class_ "field-default-value" $ do
     H.h4 "Default Value"
-    H.span ! A.class_ "default-value" $ toHtml defaultValue
+    H.span ! A.class_ "default-value" $ toHtml defValue
 fieldDefaultValueHTML Nothing                                 = return ()
 
 
@@ -240,11 +240,11 @@ fieldDefaultValueHTML Nothing                                 = return ()
 
 fieldConstraintsHTML :: [ConstraintName] -> Spec -> Html
 fieldConstraintsHTML constraintNames spec = do
-  let constraints = catMaybes $ fmap (specConstraint spec) constraintNames 
-  when (not $ null constraints) $
+  let fieldConstraints = catMaybes $ fmap (specConstraint spec) constraintNames 
+  unless (null fieldConstraints) $
     H.div ! A.class_ "constraints" $ do
       H.h4 "Constraints"
-      H.ul $ mapM_ fieldConstraintListItemHTML constraints
+      H.ul $ mapM_ fieldConstraintListItemHTML fieldConstraints
 
 
 fieldConstraintListItemHTML :: ValueConstraint -> Html
@@ -253,7 +253,7 @@ fieldConstraintListItemHTML = H.li . fieldConstraintHTML
 
 fieldConstraintHTML :: ValueConstraint -> Html
 fieldConstraintHTML valueConstraint =
-  case (valueConstraint ^. constraint) of
+  case valueConstraint ^. constraint of
     StringOneOf    c -> stringOneOfConstraintHTML c
     NumGreaterThan c -> numGreaterThanConstraintHTML c
 
@@ -269,7 +269,7 @@ typeExampleHTML = H.span "example"
 --------------------------------------------------------------------------------
 
 typeCasesHTML :: SumType -> Html
-typeCasesHTML sumType = do
+typeCasesHTML sumType =
   H.div ! A.class_ "cases" $ do
     H.h3 "Cases"
     H.ul $ forM_ (sumType ^. cases) caseListItemHTML
@@ -283,14 +283,14 @@ caseHTML :: SumCase -> Html
 caseHTML sumCase = do
   -- Name
   H.h4 ! A.class_ "case-name" $ 
-    (toHtml $ unSumCaseName $ sumCase ^. name)
+    toHtml (unSumCaseName $ sumCase ^. name)
   -- Type
   H.div ! A.class_ "case-type" $ 
-    (toHtml $ map toLower $ show $  sumCase ^. valueType)
+    toHtml (map toLower $ show $  sumCase ^. valueType)
   -- Description
-  case (sumCase ^. description) of
+  case sumCase ^. description of
     Just caseDescription -> 
-      H.div ! A.class_ "case-description" $ do
+      H.div ! A.class_ "case-description" $
         H.p $ toHtml $ unSumCaseDesc caseDescription
     Nothing              -> return ()
 
@@ -299,7 +299,7 @@ caseHTML sumCase = do
 --------------------------------------------------------------------------------
 
 stringOneOfConstraintHTML :: StringOneOfConstraint -> Html
-stringOneOfConstraintHTML oneOf = do
+stringOneOfConstraintHTML oneOf =
   H.div ! A.class_ "constraint-string-one-of" $ do
     H.span "Must be one of"
     forM_ (oneOf ^. set) $ 
