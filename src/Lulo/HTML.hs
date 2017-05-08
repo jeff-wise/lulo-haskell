@@ -26,7 +26,11 @@ import qualified Data.HashMap.Lazy as HML (toList)
 import Data.Text (Text)
 import qualified Data.Text as T
 
-import Text.Blaze.Html5 (Html, (!), toHtml, toValue)
+import Text.Blaze.Html5 (
+    Html, AttributeValue
+  , (!)
+  , toHtml, toValue
+  )
 import qualified Text.Blaze.Html5 as H
 import qualified Text.Blaze.Html5.Attributes as A
 
@@ -45,7 +49,7 @@ specHTML spec mCSSFilePath =
                                    ! A.type_ "text/css" 
                                    ! A.href (toValue cssFilePath)
         Nothing          -> return ()   
-      H.link ! A.href "https://fonts.googleapis.com/css?family=Lato"
+      H.link ! A.href "https://fonts.googleapis.com/css?family=Lato:300,400,700"
              ! A.rel "stylesheet"
       -- H.link ! A.href "https://fonts.googleapis.com/css?family=Open+Sans:400,600,700"
     H.body $
@@ -76,7 +80,7 @@ indexContentHTML spec =
 
 indexTypesSectionHTML :: [ObjectType] -> Html
 indexTypesSectionHTML objecTypes = do
-  indexSectionHeaderHTML "Types"
+  indexSectionHeaderHTML "Types" "types"
   let typesByGroupList = HML.toList $ groupToTypeMap objecTypes
   H.div ! A.id "index-types" $ 
     forM_ typesByGroupList (uncurry indexTypesGroupHTML)
@@ -84,7 +88,7 @@ indexTypesSectionHTML objecTypes = do
 
 indexTypesGroupHTML :: Text -> [ObjectType] -> Html
 indexTypesGroupHTML groupName objectTypes = do
-  indexSectionSubHeaderHTML groupName
+  indexSectionSubHeaderHTML groupName ""
   H.ul ! A.class_ (toValue groupName) $
     indexTypeLinkListItemsHTML objectTypes
 
@@ -97,7 +101,7 @@ indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
                             -- Link Display Text
                             (objectType ^. common.label)         
                             -- Link Href
-                            ('#' `T.cons` (objectType ^. common.name))
+                            (objectType ^. common.name) 
 
 
 -- > INDEX COMPONENTS
@@ -108,20 +112,26 @@ indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
 
 indexLinkHTML :: Text -> Text -> Html 
 indexLinkHTML linkName linkHref =
-  H.a ! A.class_ "index-link" 
-      ! A.href (toValue linkHref)
+  H.a ! A.class_ "object" 
+      ! A.href (anchorLink linkHref)
       $ toHtml linkName 
 
 
 -- Index Components > Headers
 --------------------------------------------------------------------------------
 
-indexSectionHeaderHTML :: Text -> Html
-indexSectionHeaderHTML headerText = H.h5 $ toHtml headerText
+indexSectionHeaderHTML :: Text -> Text -> Html
+indexSectionHeaderHTML headerText headerIdText = 
+  H.h2 $ 
+    H.a ! A.href (anchorLink headerIdText)
+        $ toHtml headerText
 
 
-indexSectionSubHeaderHTML :: Text -> Html
-indexSectionSubHeaderHTML subheaderText = H.h6 $ toHtml subheaderText
+indexSectionSubHeaderHTML :: Text -> Text -> Html
+indexSectionSubHeaderHTML subheaderText subheaderIdText = 
+  H.h3 $ 
+    H.a ! A.href (anchorLink subheaderIdText)
+        $ toHtml subheaderText
 
 
 -- CONTENT
@@ -141,9 +151,12 @@ typesSectionHTML spec =
 
 typeContainerHTML :: Spec -> ObjectType -> Html
 typeContainerHTML spec objectType =
-  H.div ! A.class_ "type" $ do
+  containerDiv $ do
     H.div ! A.class_ "definition" $ typeHTML spec objectType
     H.div ! A.class_ "example" $ typeExampleHTML
+  where
+    containerDiv = H.div ! A.id (objectId $ objectType ^. common.name)
+                         ! A.class_ "type"
 
 
 -- TYPE
@@ -313,3 +326,25 @@ numGreaterThanConstraintHTML greaterThan =
     H.span $ toHtml (greaterThan ^. lowerBound)
 
 
+-- UTILS
+--------------------------------------------------------------------------------
+
+-- | Create an anchor link from a link URL
+anchorLink :: Text -> AttributeValue
+anchorLink = toValue . T.cons '#' . objectIdText
+
+
+objectId :: Text -> AttributeValue
+objectId = toValue . objectIdText
+
+
+objectIdText :: Text -> Text
+objectIdText = T.toLower . spacesWithDashes
+    
+
+spacesWithDashes :: Text -> Text
+spacesWithDashes = T.foldr spaceIsDash T.empty 
+  where
+    spaceIsDash c t = if c == ' '
+                        then '-' `T.cons` t
+                        else c `T.cons` t

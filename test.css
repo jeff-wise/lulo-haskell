@@ -1,21 +1,58 @@
 
 
+/** CLEAR **/
+
+html, body, div, span, applet, object, iframe,
+h1, h2, h3, h4, h5, h6, p, blockquote, pre,
+a, abbr, acronym, address, big, cite, code,
+del, dfn, em, img, ins, kbd, q, s, samp,
+small, strike, strong, sub, sup, tt, var,
+b, u, i, center,
+dl, dt, dd, ol, ul, li,
+fieldset, form, label, legend,
+table, caption, tbody, tfoot, thead, tr, th, td,
+article, aside, canvas, details, embed, 
+figure, figcaption, footer, header, hgroup, 
+menu, nav, output, ruby, section, summary,
+time, mark, audio, video {
+	margin: 0;
+	padding: 0;
+	border: 0;
+	font-size: 100%;
+	font: inherit;
+	vertical-align: baseline;
+}
+/* HTML5 display-role reset for older browsers */
+article, aside, details, figcaption, figure, 
+footer, header, hgroup, menu, nav, section {
+	display: block;
+}
+body {
+	line-height: 1;
+}
+ol, ul {
+	list-style: none;
+}
+blockquote, q {
+	quotes: none;
+}
+blockquote:before, blockquote:after,
+q:before, q:after {
+	content: '';
+	content: none;
+}
+table {
+	border-collapse: collapse;
+	border-spacing: 0;
+      }
+
+
+
 body {
   background: #F2F2F2;
   font-family: 'Lato', sans-serif;
   padding: 0;
   margin: 0;
-}
-
-
-h1, h2, h3, h4, h5, h6 {
-  margin: 0;
-  padding: 0;
-}
-
-div {
-  margin: 0;
-  padding: 0;
 }
 
 
@@ -46,22 +83,37 @@ ul {
 }
 
 
+#sidebar::-webkit-scrollbar {
+  width: 0.5em;
+}
+
 #sidebar::-webkit-scrollbar-track {
   background: #E5E5E5;
 }
 
+#sidebar::-webkit-scrollbar-button {
+}
+
+
+#sidebar::-webkit-scrollbar-track-piece {
+  background: #E5E5E5;
+}
 
 #sidebar::-webkit-scrollbar-thumb {
-  background: #E5E5E5;
+  background: #C5C5C5;
 }
 
 
 #sidebar a {
   text-decoration: none;
-  font-size: 0.87em;
   color: #494949;
+}
+
+#sidebar a.object {
+  font-size: 0.87em;
   font-weight: 500;
 }
+
 
 
 #sidebar a:hover {
@@ -70,7 +122,7 @@ ul {
 
 }
 
-#sidebar h5, h6 {
+#sidebar h2, h3 {
   padding-left: 1.1em;
 }
 
@@ -78,22 +130,22 @@ ul {
   padding-left: 1.1em;
   background-color: #F2F2F2;
   padding-bottom: 0.7em;
+  border-bottom: 1px solid #CFCFCF;
 }
 
-#index h5 {
-  font-size: 1em;
-  color: #3D3D3D;
+#index h2 {
+  font-size: 0.95em;
+  color: #444;
   padding-top: 0.6em;
   padding-bottom: 0.6em;
-  font-weight: 800;
-  margin-left: -0.1em;
+  font-weight: 700;
 }
 
-#index h6 {
-  font-size: 0.9em;
-  color: #3C3C3C;
+#index h3 {
+  font-size: 0.92em;
+  color: #414141;
   padding-bottom: 0.5em;
-  padding-top: 1.2em;
+  padding-top: 1.3em;
   font-weight: 700;
   background-color: #F2F2F2;
   margin-top: 0.1em;
@@ -116,22 +168,54 @@ ul {
 
 .type .definition {
   width: 52%;
-  padding-left: 2em;
-  padding-right: 2em;
+  margin-left: 1.3em;
+  margin-right: 1.3em;
   padding-top: 2em;
   padding-bottom: 2em;
   z-index: 1000;
+  border-bottom: 1px solid #DDD;
 }
 
 .type .definition h2 {
   font-size: 2.4em;
-  color: #515151;
-  font-weight: 400;
+  color: #646464;
+  font-weight: 300;
+}
+
+.type .definition p {
+  padding-top: 1.1em;
+  padding-bottom: 1.1em;
+  color: #555555;
+  font-size: 0.92em;
+}
+
+.fields ul {
+  margin-top: 0.4em;
+}
+
+.fields {
+  margin-top: 0.5em;
+}
+
+.fields ul li {
+  background-color: #FDFDFD;
+  padding-left: 0.5em;
+  padding-right: 0.5em;
+  padding-top: 0.5em;
+  padding-bottom: 0.5em;
+  margin-bottom: 0.3em;
+  border-bottom: 1px solid #DDD;
 }
 
 
-.type .definition p.description {
-  color: #414141;
+.fields ul li .field-description {
+  font-size: 0.95em;
+}
+
+.fields h3 {
+  color: #5D5D5D;
+  font-size: 1.3em;
+  font-weight: 500;
 }
 
 .type .example {
