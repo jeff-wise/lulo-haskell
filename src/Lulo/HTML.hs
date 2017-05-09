@@ -19,7 +19,7 @@ import Lulo.Types
 import Control.Lens ((^.))
 import Control.Monad (forM_, mapM_, unless)
 
-import Data.Char (toLower)
+import Data.Char (toLower, toUpper)
 import Data.Foldable (null)
 import Data.Maybe (catMaybes)
 import qualified Data.HashMap.Lazy as HML (toList)
@@ -80,7 +80,7 @@ indexContentHTML spec =
 
 indexTypesSectionHTML :: [ObjectType] -> Html
 indexTypesSectionHTML objecTypes = do
-  indexSectionHeaderHTML "Types" "types"
+  indexSectionHeaderHTML "Types"
   let typesByGroupList = HML.toList $ groupToTypeMap objecTypes
   H.div ! A.id "index-types" $ 
     forM_ typesByGroupList (uncurry indexTypesGroupHTML)
@@ -88,7 +88,7 @@ indexTypesSectionHTML objecTypes = do
 
 indexTypesGroupHTML :: Text -> [ObjectType] -> Html
 indexTypesGroupHTML groupName objectTypes = do
-  indexSectionSubHeaderHTML groupName ""
+  indexSectionSubHeaderHTML groupName
   H.ul ! A.class_ (toValue groupName) $
     indexTypeLinkListItemsHTML objectTypes
 
@@ -120,17 +120,17 @@ indexLinkHTML linkName linkHref =
 -- Index Components > Headers
 --------------------------------------------------------------------------------
 
-indexSectionHeaderHTML :: Text -> Text -> Html
-indexSectionHeaderHTML headerText headerIdText = 
+indexSectionHeaderHTML :: Text -> Html
+indexSectionHeaderHTML headerText = 
   H.h2 $ 
-    H.a ! A.href (anchorLink headerIdText)
+    H.a ! A.href (anchorLink headerText)
         $ toHtml headerText
 
 
-indexSectionSubHeaderHTML :: Text -> Text -> Html
-indexSectionSubHeaderHTML subheaderText subheaderIdText = 
+indexSectionSubHeaderHTML :: Text -> Html
+indexSectionSubHeaderHTML subheaderText = 
   H.h3 $ 
-    H.a ! A.href (anchorLink subheaderIdText)
+    H.a ! A.href (anchorLink subheaderText)
         $ toHtml subheaderText
 
 
@@ -144,10 +144,27 @@ contentHTML = typesSectionHTML
 
 
 typesSectionHTML :: Spec -> Html
-typesSectionHTML spec = 
+typesSectionHTML spec = do
+  let typesByGroupList = HML.toList $ groupToTypeMap $ spec ^. types 
   H.div ! A.id "types" $ 
-    forM_ (spec ^. types) $ typeContainerHTML spec
+    forM_ typesByGroupList (uncurry $ typeGroupHTML spec)
 
+
+typeGroupHTML :: Spec -> Text -> [ObjectType] -> Html
+typeGroupHTML spec groupName objectTypes = do
+  typeSectionHeaderHTML groupName
+  H.div ! A.class_ "group" $
+    forM_ objectTypes $ typeContainerHTML spec
+
+
+typeSectionHeaderHTML :: Text -> Html
+typeSectionHeaderHTML headerText =
+  containerDiv $ do
+    H.div ! A.class_ "definition" $
+      H.h2 ! A.id (objectId headerText) $ toHtml headerText
+    H.div ! A.class_ "example" $ ""
+  where
+    containerDiv = H.div ! A.class_ "section-header"
 
 typeContainerHTML :: Spec -> ObjectType -> Html
 typeContainerHTML spec objectType =
@@ -176,7 +193,7 @@ typeHTML spec objectType = do
 
 
 typeHeaderHTML :: Text -> Html
-typeHeaderHTML = H.h2 . toHtml
+typeHeaderHTML = H.h3 . toHtml
 
 
 typeDescriptionHTML :: Maybe Text -> Html
@@ -188,7 +205,7 @@ typeDescriptionHTML Nothing     = return ()
 typeFieldsHTML :: Spec -> ProductType -> Html
 typeFieldsHTML spec productType =
   H.div ! A.class_ "fields" $ do
-    H.h3 "Fields"
+    H.h4 "Fields"
     H.ul $ forM_ (productType ^. fields) (fieldListItemHTML spec)
 
 
@@ -200,49 +217,54 @@ fieldListItemHTML spec = H.li . fieldHTML spec
 --------------------------------------------------------------------------------
 
 fieldHTML :: Spec -> Field -> Html
-fieldHTML spec field = do
-  -- Name
-  fieldNameHTML $ field ^. name
-  -- Presence
-  fieldPresenceHTML $ field ^. presence
-  -- Type
-  fieldTypeHTML $ field ^. valueType
-  -- Description
-  fieldDescriptionHTML $ field ^. description
-  -- Constraints
-  fieldConstraintsHTML (field ^. constraints) spec
-  -- Default Value
-  fieldDefaultValueHTML $ field ^. defaultValue
+fieldHTML spec field =
+  fieldContainerDiv $ do
+    -- Presence
+    fieldPresenceHTML $ field ^. presence
+    -- Name
+    fieldNameHTML $ field ^. name
+    -- Type
+    fieldTypeHTML $ field ^. valueType
+    -- Description
+    fieldDescriptionHTML $ field ^. description
+    -- Constraints
+    fieldConstraintsHTML (field ^. constraints) spec
+    -- Default Value
+    fieldDefaultValueHTML $ field ^. defaultValue
+  where
+    fieldContainerDiv = H.div ! A.class_ "field"
 
 
 fieldNameHTML :: FieldName -> Html
 fieldNameHTML fieldName = 
-  H.h4 ! A.class_ "field-name" $ 
+  H.h5 ! A.class_ "name" $ 
     toHtml (unFieldName fieldName)
 
 
 fieldPresenceHTML :: Presence -> Html
-fieldPresenceHTML fieldPresence = 
-  H.div ! A.class_ "field-presence" $ 
-    toHtml (map toLower $ show fieldPresence)
+fieldPresenceHTML fieldPresence = do
+  let presenceString = show fieldPresence
+      presenceClassString = "presence " ++ map toLower presenceString
+  H.div ! A.class_ (toValue presenceClassString) $ 
+    toHtml (map toUpper presenceString)
 
 
 fieldTypeHTML :: ValueType -> Html
 fieldTypeHTML fieldType = 
-  H.div ! A.class_ "field-type" $ 
+  H.div ! A.class_ "type" $ 
     toHtml (map toLower $ show fieldType)
 
 
 fieldDescriptionHTML :: Maybe FieldDescription -> Html
 fieldDescriptionHTML (Just fieldDescription) = 
-  H.div ! A.class_ "field-description" $
+  H.div ! A.class_ "description" $
     H.p (toHtml $ unFieldDesc fieldDescription)
 fieldDescriptionHTML Nothing                 = return ()
 
 
 fieldDefaultValueHTML :: Maybe FieldDefaultValue -> Html
 fieldDefaultValueHTML (Just (FieldDefaultValue defValue)) =
-  H.div ! A.class_ "field-default-value" $ do
+  H.div ! A.class_ "default-value" $ do
     H.h4 "Default Value"
     H.span ! A.class_ "default-value" $ toHtml defValue
 fieldDefaultValueHTML Nothing                                 = return ()
