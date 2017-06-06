@@ -7,8 +7,8 @@
 module Lulo.Parse where
 
 
-import Lulo.Types
-import Lulo.Types.Spec.JSON
+import Lulo.Spec.Types (Spec)
+import Lulo.Spec.JSON ()
 
 import Data.Yaml as YAML (ParseException (..))
 import qualified Data.Yaml as YAML (decodeFileEither)
@@ -26,7 +26,7 @@ parseSpecFile filepath = do
 
 
 handleParseException :: YAML.ParseException -> IO ()
-handleParseException exception = putStrLn $ show exception
+handleParseException = print
   -- case exception of
   --   InvalidYaml (Just exception) -> putStrLn $ show exception
   --   _                            -> return ()

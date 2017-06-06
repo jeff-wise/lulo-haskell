@@ -18,15 +18,23 @@ library
   exposed-modules:      Lulo
                         Lulo.CLI
   other-modules:        Lulo.HTML
+                        Lulo.HTML.Types
+                        Lulo.HTML.Spec.Combinators
+                        Lulo.HTML.Spec.Content
+                        Lulo.HTML.Spec.Sidebar
                         Lulo.Parse
                         Lulo.Types
-                        Lulo.Types.Spec.JSON
+                        Lulo.Spec.Index
+                        Lulo.Spec.JSON
+                        Lulo.Spec.Types
   build-depends:        base >= 4.7 && < 5
                       , aeson
                       , blaze-html
                       , bytestring
                       , hashable
                       , lens
+                      , markdown
+                      , mtl
                       , optparse-applicative
                       , text
                       , unordered-containers

@@ -53,6 +53,7 @@ body {
   font-family: 'Lato', sans-serif;
   padding: 0;
   margin: 0;
+  font-size: 1.17rem;
 }
 
 
@@ -60,6 +61,16 @@ ul {
   list-style-type: none;
   margin: 0;
   padding: 0;
+}
+
+a {
+  color: #0e99bb;
+}
+
+a:hover {
+  color: #0a6f88;
+  cursor: pointer;
+  text-decoration: underline;
 }
 
 #specification {
@@ -80,6 +91,7 @@ ul {
   margin-right: 0;
   background-color: #E2E2E2;
   padding-right: 0.1em;
+  padding-top: 1em;
 }
 
 
@@ -122,10 +134,6 @@ ul {
 
 }
 
-#sidebar h2, #sidebar h3 {
-  padding-left: 1.1em;
-}
-
 #sidebar ul {
   padding-left: 1.1em;
   background-color: #F2F2F2;
@@ -135,9 +143,9 @@ ul {
 
 #index h2 {
   font-size: 0.95em;
-  color: #444;
-  padding-top: 0.6em;
-  padding-bottom: 0.6em;
+  color: #3D3D3D;
+  padding-top: 0.7em;
+  padding-bottom: 0.7em;
   font-weight: 700;
 }
 
@@ -149,7 +157,6 @@ ul {
   font-weight: 700;
   background-color: #F2F2F2;
   margin-top: 0.3em;
-  margin-left: 0.1em;
 }
 
 #index li {
@@ -161,10 +168,37 @@ ul {
   display: flex;
 }
 
-.type .definition {
+
+#content .definition {
   width: 52%;
   padding-left: 25px;
   padding-right: 25px;
+}
+
+
+#content .example {
+  width: 48%;
+  background-color: #252525;
+}
+
+#description {
+  display: flex;
+}
+
+
+#description .definition {
+  border-bottom: 1px solid #DDD;
+  padding-top: 1.5em;
+  padding-bottom: 1.5em;
+}
+
+#content p {
+  font-size: 0.95em;
+  color: #3C3C3C;
+  line-height: 1.6em;
+}
+
+.type .definition {
   padding-bottom: 2em;
   z-index: 1000;
   padding-top: 1.2em;
@@ -181,23 +215,20 @@ ul {
 
 
 .section-header .definition {
-  width: 52%;
-  padding-left: 25px;
-  padding-right: 25px;
   padding-top: 20px;
 }
 
 .section-header .example {
-  width: 48%;
   background-color: #252525;
   padding-top: 20px;
 }
 
 
-.section-header .definition h2 {
+#content h2 {
   font-size: 1.9em;
   color: #515151;
   font-weight: 500;
+  margin-bottom: 0.5em;
 }
 
 .type .definition h3 {
@@ -206,7 +237,7 @@ ul {
   font-weight: 300;
 }
 
-.type .definition p {
+.type .definition > p {
   padding-top: 1.1em;
   padding-bottom: 1.1em;
   color: #555555;
@@ -223,49 +254,58 @@ ul {
 }
 
 .field {
-  background-color: #FDFDFD;
+  background-color: #FBFBFB;
   padding-left: 0.7em;
   padding-right: 0.7em;
-  padding-top: 1em;
-  padding-bottom: 1em;
-  margin-bottom: 0.4em;
-  border-bottom: 1px solid #D9D9D9;
+  padding-top: 0.3em;
+  padding-bottom: 0.3em;
+  margin-bottom: 0.6em;
+  box-shadow: 0px 1px 1px 0 #C5C5C5;
 }
 
-
-.fields ul li .field-description {
-  font-size: 0.95em;
-}
 
 
 .fields h4 {
-  color: #5D5D5D;
-  font-size: 1.3em;
-  font-weight: 300;
-}
-
-.field .presence {
-  font-size: 0.7em;
-  color: #666;
-}
-
-.field .name {
-  margin-top: 0.4em;
+  color: #515151;
   font-size: 1.1em;
-  color: #333;
   font-weight: 500;
-  display: inline-block;
 }
 
-.field .type {
-  float: right;
-  display: inline-block;
-  font-weight: 500;
-  color: #444;
-  font-size: 0.95em;
-  padding-top: 0.45em;
-  background-color: #BBB;
+
+.field .property {
+  display: flex;
+  padding-top: 10px;
+  padding-bottom: 10px;
 }
+
+.field > :not(:last-child) {
+  border-bottom: 1px solid #EEE;
+}
+
+.field .property .label {
+  min-width: 140px;
+  color: #828282;
+  font-weight: 700;
+  font-size: 0.7em;
+  padding-left: 4px;
+  line-height: 1.65em;
+}
+
+.field .property .value {
+  font-size: 0.93em;
+  color: #333;
+  line-height: 1.3em;
+}
+
+
+.field .property .value.name {
+  font-weight: 700;
+}
+
+.field .property .value.description {
+  color: #444;
+}
+
 
 .type .example {
   width: 48%;

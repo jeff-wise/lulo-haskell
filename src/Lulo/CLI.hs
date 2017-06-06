@@ -6,21 +6,18 @@
 module Lulo.CLI where
 
 
-import Lulo.HTML (specHTML)
+import Lulo.HTML as LuloHtml
+import Lulo.HTML.Types (HtmlSettings (..))
 import Lulo.Parse (parseSpecFile)
-import Lulo.Types (
-    Parameters (..)
-  , specFilename, verbosity, htmlFilename, htmlFilePretty, cssFilename
-  , Verbosity (..)
-  , Spec
-  )
+import Lulo.Types
+import Lulo.Spec.Types (Spec)
+import Lulo.Spec.Index (specIndex)
 
 import Control.Lens
 import Control.Monad (when)
 
 import qualified Data.ByteString.Lazy as BL
 import Data.Monoid ((<>))
-import Data.Text (Text)
 
 import qualified Text.Blaze.Html.Renderer.Pretty as Pretty (renderHtml)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
@@ -67,14 +64,14 @@ parameterParser = Parameters
                   (  long "verbose" 
                   <> short 'v' 
                   <> help "Enable verbose mode." )
-              <*> (optional $ strOption
-                    (  long "html"
-                    <> metavar "HTML"
-                    <> help "The file path of the generated HTML file." ) )
-              <*> (optional $ strOption
-                    (  long "css"
-                    <> metavar "CSS"
-                    <> help "The file path of a CSS file for the HTML file." ) )
+              <*> optional (strOption
+                  (  long "html"
+                  <> metavar "HTML"
+                  <> help "The file path of the generated HTML file." ) )
+              <*> optional (strOption
+                  (  long "css"
+                  <> metavar "CSS"
+                  <> help "The file path of a CSS file for the HTML file." ) )
               <*> switch
                   (  long "html-pretty" 
                   <> help "Output pretty printed HTML." )
@@ -101,7 +98,7 @@ processSpec spec parameters = do
   when isVerbose $
     putStrLn "Spec parsed successfully."
   -- HTML generation
-  case (parameters ^. htmlFilename) of
+  case parameters ^. htmlFilename of
     Just filename -> 
       generateHTMLFile spec filename parameters
     Nothing           -> 
@@ -111,9 +108,12 @@ processSpec spec parameters = do
 
 generateHTMLFile :: Spec -> FilePath -> Parameters -> IO () 
 generateHTMLFile spec filename parameters = do
-  let mCSSFilePath = (parameters ^. cssFilename) 
-  case (parameters ^. htmlFilePretty) of
-    True -> writeFile filename $ 
-              Pretty.renderHtml $ specHTML spec mCSSFilePath
-    False -> BL.writeFile filename $ renderHtml $ specHTML spec mCSSFilePath
+  let mCSSFilePath = parameters ^. cssFilename
+      _specIndex   = specIndex spec
+  if parameters ^. htmlFilePretty
+     then writeFile filename $ 
+       Pretty.renderHtml $ LuloHtml.specDoc _specIndex 
+                                            (HtmlSettings mCSSFilePath)
+     else BL.writeFile filename $ renderHtml $ 
+              LuloHtml.specDoc _specIndex (HtmlSettings mCSSFilePath)
 
