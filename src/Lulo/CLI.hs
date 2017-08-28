@@ -8,9 +8,9 @@ module Lulo.CLI where
 
 import Lulo.HTML as LuloHtml
 import Lulo.HTML.Types (HtmlSettings (..))
-import Lulo.Parse (parseSpecFile)
 import Lulo.Types
 import Lulo.Spec.Types (Spec)
+import Lulo.Spec.JSON ()
 import Lulo.Spec.Index (specIndex)
 
 import Control.Lens
@@ -18,6 +18,7 @@ import Control.Monad (when)
 
 import qualified Data.ByteString.Lazy as BL
 import Data.Monoid ((<>))
+import qualified Data.Yaml as YAML (decodeFileEither)
 
 import qualified Text.Blaze.Html.Renderer.Pretty as Pretty (renderHtml)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
@@ -65,11 +66,11 @@ parameterParser = Parameters
                   <> short 'v' 
                   <> help "Enable verbose mode." )
               <*> optional (strOption
-                  (  long "html"
+                  (  long "html-out"
                   <> metavar "HTML"
                   <> help "The file path of the generated HTML file." ) )
               <*> optional (strOption
-                  (  long "css"
+                  (  long "html-css"
                   <> metavar "CSS"
                   <> help "The file path of a CSS file for the HTML file." ) )
               <*> switch
@@ -83,10 +84,11 @@ parameterParser = Parameters
 parseSpec :: Parameters -> IO ()
 parseSpec parameters = do
   let isVerbose = (parameters ^. verbosity) == Verbose
-  mSpec <- parseSpecFile (parameters ^. specFilename)
-  case mSpec of
-    Just spec -> processSpec spec parameters
-    Nothing   -> 
+  eSpec <- YAML.decodeFileEither (parameters ^. specFilename)
+  case eSpec of
+    Right spec      -> processSpec spec parameters
+    Left  exception -> do
+      print exception
       when isVerbose $ 
         putStrLn $ "Could not be parse " <> (parameters ^. specFilename)
 

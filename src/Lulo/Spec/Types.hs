@@ -5,16 +5,12 @@
 
 {-# LANGUAGE DeriveGeneric #-}
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE TemplateHaskell #-}
 
 
 module Lulo.Spec.Types where
 
-
-import Control.Lens.TH (makeFields)
 
 import Data.Hashable
 import Data.HashSet (HashSet)
@@ -31,12 +27,12 @@ import GHC.Generics (Generic)
 --------------------------------------------------------------------------------
 
 data Spec = Spec
-  { _specVersion      :: SpecVersion
-  , _specAuthors      :: [SpecAuthor]
-  , _specDescription  :: Maybe SpecDescription    
-  , _specRootTypeName :: Maybe CustomTypeName    
-  , _specTypes        :: [CustomType]
-  , _specConstraints  :: [Constraint]
+  { specVersion      :: SpecVersion
+  , specMetadata     :: SpecMetadata
+  , specDescription  :: Maybe SpecDescription    
+  , specRootTypeName :: Maybe CustomTypeName    
+  , specTypes        :: [CustomType]
+  , specConstraints  :: [Constraint]
   }
 
 
@@ -48,18 +44,34 @@ newtype SpecVersion = SpecVersion
   deriving (Eq, Show)
 
 
--- Specification > Author
+-- Specification > Metadata
+--------------------------------------------------------------------------------
+
+data SpecMetadata = SpecMetadata
+  { specName    :: SpecName
+  , specAuthors :: [SpecAuthor]
+  }
+
+
+-- Specification > Metadata > Name
+--------------------------------------------------------------------------------
+
+newtype SpecName = SpecName
+  { getSpecName :: Text }
+
+
+-- Specification > Metadata > Author
 --------------------------------------------------------------------------------
 
 newtype SpecAuthor = SpecAuthor
-  { unSpecAuthor :: Text }
+  { getSpecAuthor :: Text }
 
 
 -- Specification > Description
 --------------------------------------------------------------------------------
 
 newtype SpecDescription = SpecDescription
-  { _specDescriptionOverviewMarkdown :: Text
+  { descOverviewMarkdown :: Text
   }
 
 
@@ -68,8 +80,8 @@ newtype SpecDescription = SpecDescription
 --------------------------------------------------------------------------------
 
 data CustomType = CustomType 
-  { _customTypeTypeData   :: CustomTypeData
-  , _customTypeCustomType :: CustomType'
+  { typeData    :: CustomTypeData
+  , customType' :: CustomType'
   } deriving (Eq, Generic)
 
 
@@ -93,11 +105,11 @@ instance Hashable CustomType'
 --------------------------------------------------------------------------------
 
 data CustomTypeData = CustomTypeData
-  { _customTypeDataName         :: CustomTypeName
-  , _customTypeDataLabel        :: CustomTypeLabel
-  , _customTypeDataDescription  :: Maybe CustomTypeDescription
-  , _customTypeDataGroup        :: Maybe CustomTypeGroup
-  , _customTypeDataYamlExamples :: [YAML.Value]
+  { typeName         :: CustomTypeName
+  , typeLabel        :: CustomTypeLabel
+  , typeDescription  :: Maybe CustomTypeDescription
+  , typeGroup        :: Maybe CustomTypeGroup
+  , typeYamlExamples :: [YAML.Value]
   } deriving (Eq, Generic)
 
 
@@ -108,8 +120,8 @@ instance Hashable CustomTypeData
 --------------------------------------------------------------------------------
 
 newtype CustomTypeName = CustomTypeName
-  { _customTypeNameText :: Text }
-  deriving (Eq, Generic)
+  { getCustomTypeName :: Text }
+  deriving (Eq, Generic, Ord)
 
 
 instance Hashable CustomTypeName
@@ -119,7 +131,7 @@ instance Hashable CustomTypeName
 --------------------------------------------------------------------------------
 
 newtype CustomTypeLabel = CustomTypeLabel
-  { _customTypeLabelText :: Text }
+  { getCustomTypeLabel :: Text }
   deriving (Eq, Generic)
 
 
@@ -142,7 +154,7 @@ instance Hashable CustomTypeDescription
 
 newtype CustomTypeGroup = CustomTypeGroup
   { getCustomTypeGroup :: Text }
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Generic, Ord, Show)
 
 
 instance Hashable CustomTypeGroup
@@ -153,7 +165,7 @@ instance Hashable CustomTypeGroup
 --------------------------------------------------------------------------------
 
 newtype ProductCustomType = ProductCustomType
-  { _productCustomTypeFields :: [Field]
+  { typeFields :: [Field]
   } deriving (Eq, Generic)
 
 
@@ -164,12 +176,12 @@ instance Hashable ProductCustomType
 --------------------------------------------------------------------------------
 
 data Field = Field
-  { _fieldName          :: FieldName
-  , _fieldPresence      :: FieldPresence
-  , _fieldDescription   :: Maybe FieldDescription
-  , _fieldValueType     :: ValueType
-  , _fieldConstraints   :: [ConstraintName]
-  , _fieldDefaultValue  :: Maybe FieldDefaultValue
+  { fieldName          :: FieldName
+  , fieldPresence      :: FieldPresence
+  , fieldDescription   :: Maybe FieldDescription
+  , fieldValueType     :: ValueType
+  , fieldConstraints   :: [ConstraintName]
+  , fieldDefaultValue  :: Maybe FieldDefaultValue
   } deriving (Eq, Generic)
 
 
@@ -180,7 +192,7 @@ instance Hashable Field
 --------------------------------------------------------------------------------
 
 newtype FieldName = FieldName
-  { unFieldName :: Text }
+  { getFieldName :: Text }
   deriving (Eq, Generic)
 
 
@@ -191,7 +203,7 @@ instance Hashable FieldName
 --------------------------------------------------------------------------------
 
 newtype FieldDescription = FieldDescription
-  { unFieldDesc :: Text }
+  { getFieldDesc :: Text }
   deriving (Eq, Generic)
 
 
@@ -202,7 +214,7 @@ instance Hashable FieldDescription
 --------------------------------------------------------------------------------
 
 newtype FieldDefaultValue = FieldDefaultValue
-  { unFieldDefaultValue :: Text }
+  { getFieldDefaultValue :: Text }
   deriving (Eq, Generic)
 
 
@@ -226,7 +238,7 @@ instance Hashable FieldPresence
 --------------------------------------------------------------------------------
 
 newtype SumCustomType = SumCustomType
-  { _sumCustomTypeCases  :: [Case]
+  { typeCases  :: [Case]
   } deriving (Eq, Generic)
 
 
@@ -237,8 +249,8 @@ instance Hashable SumCustomType
 --------------------------------------------------------------------------------
 
 data Case = Case
-  { _caseCaseType    :: CustomTypeName
-  , _caseDescription :: Maybe CaseDescription
+  { caseType        :: CustomTypeName
+  , caseDescription :: Maybe CaseDescription
   } deriving (Eq, Generic)
 
 
@@ -249,7 +261,7 @@ instance Hashable Case
 --------------------------------------------------------------------------------
 
 newtype CaseDescription = CaseDescription
-  { _caseDescriptionText :: Text }
+  { getCaseDescription :: Text }
   deriving (Eq, Generic)
 
 
@@ -261,8 +273,8 @@ instance Hashable CaseDescription
 --------------------------------------------------------------------------------
 
 data PrimCustomType = PrimCustomType
-  { _simpleCustomTypeBaseType    :: PrimValueType
-  , _simpleCustomTypeConstraints :: [ConstraintName] 
+  { primTypeBaseType    :: PrimValueType
+  , primTypeConstraints :: [ConstraintName] 
   } deriving (Eq, Generic)
 
 
@@ -285,12 +297,11 @@ instance Hashable ValueType
 
 
 instance Show ValueType where
-  show (Prim           primValueType)             = show primValueType
-  show (PrimList       primValueType)             = 
+  show (Prim           primValueType)         = show primValueType
+  show (PrimList       primValueType)         = 
     show primValueType ++ " list"
-  show (Custom         (CustomTypeName typeName)) = T.unpack typeName
-  show (CustomList     (CustomTypeName typeName)) = 
-    T.unpack typeName ++ " list"
+  show (Custom         (CustomTypeName name)) = T.unpack name
+  show (CustomList     (CustomTypeName name)) = T.unpack name ++ " list"
 
 
 -- Value > Primitive
@@ -337,8 +348,8 @@ listType parameterType =
 --------------------------------------------------------------------------------
 
 data Constraint = Constraint 
-  { _constraintConstraintData :: ConstraintData
-  , _constraintConstraint'    :: Constraint'
+  { constraintData :: ConstraintData
+  , constraint'    :: Constraint'
   } deriving (Eq, Generic) 
 
 
@@ -349,8 +360,8 @@ instance Hashable Constraint
 --------------------------------------------------------------------------------
 
 data ConstraintData = ConstraintData
-  { _constraintDataName        :: ConstraintName
-  , _constraintDataDescription :: Maybe ConstraintDescription
+  { constraintName        :: ConstraintName
+  , constraintDescription :: Maybe ConstraintDescription
   } deriving (Eq, Generic)
 
 
@@ -361,8 +372,8 @@ instance Hashable ConstraintData
 --------------------------------------------------------------------------------
 
 newtype ConstraintName = ConstraintName
-  { unConstraintName :: Text }
-  deriving (Eq, Generic)
+  { getConstraintName :: Text }
+  deriving (Eq, Generic, Ord)
 
 
 instance Hashable ConstraintName
@@ -372,7 +383,7 @@ instance Hashable ConstraintName
 --------------------------------------------------------------------------------
 
 newtype ConstraintDescription = ConstraintDescription
-  { unConstraintDescription :: Text }
+  { getConstraintDescription :: Text }
   deriving (Eq, Generic)
 
 
@@ -395,7 +406,7 @@ instance Hashable Constraint'
 --------------------------------------------------------------------------------
 
 newtype StringOneOfConstraint = StringOneOfConstraint
-  { _stringOneOfConstraintStringSet :: HashSet Text
+  { stringOneOfSet :: HashSet Text
   } deriving (Eq, Generic)
 
 
@@ -407,29 +418,9 @@ instance Hashable StringOneOfConstraint
 
 -- Lower Bound is Exclusive
 newtype NumberGreaterThanConstraint = NumberGreaterThanConstraint
-  { _numberGreaterThanConstraintLowerBound :: Double
+  { numberGreaterThanLowerBound :: Double
   } deriving (Eq, Generic)
 
 
 instance Hashable NumberGreaterThanConstraint
 
-
--- LENSES
---------------------------------------------------------------------------------
-
-makeFields ''Spec
-makeFields ''SpecDescription
-makeFields ''CustomType
-makeFields ''CustomTypeData
-makeFields ''CustomTypeName
-makeFields ''CustomTypeLabel
-makeFields ''CustomTypeDescription
-makeFields ''ProductCustomType
-makeFields ''Field
-makeFields ''SumCustomType
-makeFields ''Case
-makeFields ''CaseDescription
-makeFields ''Constraint
-makeFields ''ConstraintData
-makeFields ''StringOneOfConstraint
-makeFields ''NumberGreaterThanConstraint

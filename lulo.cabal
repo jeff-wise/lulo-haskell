@@ -1,13 +1,13 @@
 name:                lulo
-version:             0.1.0.0
+version:             0.7.0
 -- synopsis:
 -- description:
 homepage:            https://github.com/githubuser/lulo#readme
 license:             BSD3
 license-file:        LICENSE
-author:              Author name here
-maintainer:          example@example.com
-copyright:           2017 Author name here
+author:              Jeff Wise
+maintainer:          jeff.scott.wise@gmail.com
+copyright:           2017 Jeff Wise
 category:            Web
 build-type:          Simple
 extra-source-files:  README.md
@@ -17,20 +17,20 @@ library
   hs-source-dirs:       src
   exposed-modules:      Lulo
                         Lulo.CLI
+                        Lulo.Spec.JSON
   other-modules:        Lulo.HTML
                         Lulo.HTML.Types
                         Lulo.HTML.Spec.Combinators
                         Lulo.HTML.Spec.Content
                         Lulo.HTML.Spec.Sidebar
-                        Lulo.Parse
                         Lulo.Types
                         Lulo.Spec.Index
-                        Lulo.Spec.JSON
                         Lulo.Spec.Types
   build-depends:        base >= 4.7 && < 5
                       , aeson
                       , blaze-html
                       , bytestring
+                      , containers
                       , hashable
                       , lens
                       , markdown

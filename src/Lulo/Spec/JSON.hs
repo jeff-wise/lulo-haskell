@@ -34,11 +34,11 @@ import Data.Yaml ((.:), (.:?), Parser, FromJSON, parseJSON)
 instance FromJSON Spec where
   parseJSON (YAML.Object hm) = Spec
                            <$> hm .: "version"
-                           <*> hm .: "authors"
+                           <*> hm .: "metadata"
                            <*> hm .: "description"
                            <*> hm .: "root_type"
                            <*> hm .: "types"
-                           <*> hm .: "constraints"
+                           <*> (concat . maybeToList <$> hm .:? "constraints")
   parseJSON invalid    = YAML.typeMismatch "Spec" invalid
 
 
@@ -50,7 +50,25 @@ instance FromJSON SpecVersion where
   parseJSON invalid         = YAML.typeMismatch "SpecVersion" invalid
 
 
--- Specification > Author
+-- Specification > Metadata
+--------------------------------------------------------------------------------
+
+instance FromJSON SpecMetadata where
+  parseJSON (YAML.Object hm) = SpecMetadata
+                           <$> hm .: "name"
+                           <*> (concat . maybeToList <$> hm .:? "authors")
+  parseJSON invalid          = YAML.typeMismatch "SpecMetadata" invalid
+
+
+-- Specification > Metadata > Name
+--------------------------------------------------------------------------------
+
+instance FromJSON SpecName where
+  parseJSON (YAML.String s) = return $ SpecName s
+  parseJSON invalid         = YAML.typeMismatch "SpecName" invalid
+
+
+-- Specification > Metadata > Author
 --------------------------------------------------------------------------------
 
 instance FromJSON SpecAuthor where

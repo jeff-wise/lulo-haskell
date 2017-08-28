@@ -14,26 +14,26 @@
 module Lulo.Spec.Index
   ( SpecIndex
   , specIndex
-  , specVersion
-  , specDescription
-  , specConstraintWithName
-  , specCustomTypes
-  , specTypesByGroup
+  , specIndexVersion
+  , specIndexMetadata
+  , specIndexDescription
+  , specIndexRootTypeName
+  , constraintWithName
+  , customTypes
+  , typesByGroupAsc
   ) where
 
 
 import Lulo.Spec.Types
 
-import Control.Lens
-
 import Data.Foldable (foldl')
-import Data.HashMap.Lazy (HashMap)
-import qualified Data.HashMap.Lazy as HML (
+import Data.Map.Lazy (Map)
+import qualified Data.Map.Lazy as Map (
     empty
   , insert, insertWith
   , lookup
   , elems
-  , toList
+  , toAscList
   )
 import Data.HashSet (HashSet)
 import qualified Data.HashSet as Set (
@@ -52,12 +52,12 @@ import Data.Maybe (fromMaybe)
 -- looking up components of a specification.
 data SpecIndex = SpecIndex
   { specIndexVersion           :: SpecVersion
-  , specIndexAuthors           :: [SpecAuthor]
+  , specIndexMetadata          :: SpecMetadata
   , specIndexDescription       :: Maybe SpecDescription    
   , specIndexRootTypeName      :: Maybe CustomTypeName    
-  , specIndexTypeByName        :: HashMap CustomTypeName CustomType
-  , specIndexConstraintByName  :: HashMap ConstraintName Constraint
-  , specIndexTypesByGroup      :: HashMap CustomTypeGroup (HashSet CustomType)
+  , specIndexTypeByName        :: Map CustomTypeName CustomType
+  , specIndexConstraintByName  :: Map ConstraintName Constraint
+  , specIndexTypesByGroup      :: Map CustomTypeGroup (HashSet CustomType)
   }
 
 
@@ -68,67 +68,52 @@ data SpecIndex = SpecIndex
 specIndex :: Spec -> SpecIndex
 specIndex spec = 
   SpecIndex
-    (spec ^. version)
-    (spec ^. authors)
-    (spec ^. description)
-    (spec ^. rootTypeName)
-    (customTypeByNameMap $ spec ^. types)
-    (constraintByNameMap $ spec ^. constraints)
-    (groupToTypesMap $ spec ^. types)
+    (specVersion spec)
+    (specMetadata spec)
+    (specDescription spec)
+    (specRootTypeName spec)
+    (customTypeByNameMap $ specTypes spec)
+    (constraintByNameMap $ specConstraints spec)
+    (groupToTypesMap $ specTypes spec)
 
   where
                 
     -- | CustomTypeName -> CustomType index
-    customTypeByNameMap :: [CustomType] -> HashMap CustomTypeName CustomType
-    customTypeByNameMap = foldl' withCustomType HML.empty
+    customTypeByNameMap :: [CustomType] -> Map CustomTypeName CustomType
+    customTypeByNameMap = foldl' withCustomType Map.empty
       where
-        withCustomType hm t = HML.insert (t ^. typeData.name) t hm
+        withCustomType hm t = Map.insert (typeName $ typeData t) t hm
 
     -- | ConstraintName -> CustomType index
-    constraintByNameMap :: [Constraint] -> HashMap ConstraintName Constraint
-    constraintByNameMap = foldl' indexConstraint HML.empty
+    constraintByNameMap :: [Constraint] -> Map ConstraintName Constraint
+    constraintByNameMap = foldl' indexConstraint Map.empty
       where
-        indexConstraint hm c = HML.insert (c ^. constraintData.name) c hm
+        indexConstraint hm c = Map.insert (constraintName $ constraintData c) c hm
 
     -- | Group -> Custom Type index
     -- Custom type can be put into groups to organize them. For some group, get 
     -- all of the types in that group.
-    groupToTypesMap :: [CustomType] -> HashMap CustomTypeGroup (HashSet CustomType)
-    groupToTypesMap = foldl' withCustomType HML.empty 
+    groupToTypesMap :: [CustomType] -> Map CustomTypeGroup (HashSet CustomType)
+    groupToTypesMap = foldl' withCustomType Map.empty 
       where
         withCustomType hm _customType = 
           let groupName = fromMaybe (CustomTypeGroup "no_group") 
-                                    (_customType ^. typeData.group)
-          in  HML.insertWith Set.union groupName (Set.singleton _customType) hm
+                                    (typeGroup $ typeData _customType)
+          in  Map.insertWith Set.union groupName (Set.singleton _customType) hm
 
 
 --------------------------------------------------------------------------------
 -- API
 --------------------------------------------------------------------------------
 
-specVersion :: SpecIndex -> SpecVersion
-specVersion = specIndexVersion 
+constraintWithName :: SpecIndex -> ConstraintName -> Maybe Constraint
+constraintWithName = flip Map.lookup . specIndexConstraintByName
 
 
-specDescription :: SpecIndex -> Maybe SpecDescription
-specDescription = specIndexDescription
+customTypes :: SpecIndex -> [CustomType]
+customTypes = Map.elems . specIndexTypeByName 
 
 
-specConstraintWithName :: SpecIndex -> ConstraintName -> Maybe Constraint
-specConstraintWithName = flip HML.lookup . specIndexConstraintByName
-
-
-specCustomTypes :: SpecIndex -> [CustomType]
-specCustomTypes = HML.elems . specIndexTypeByName 
-
-
-specTypesByGroup :: SpecIndex -> [(CustomTypeGroup, HashSet CustomType)]
-specTypesByGroup = HML.toList . specIndexTypesByGroup
-
-
--- specConstraint :: Spec -> ConstraintName -> Maybe LuloConstraint
--- specConstraint spec constraintName =
---       builtInConstraint constraintName
---   <|> HML.lookup constraintName (_specConstraintIndex spec)
-
+typesByGroupAsc :: SpecIndex -> [(CustomTypeGroup, HashSet CustomType)]
+typesByGroupAsc = Map.toAscList . specIndexTypesByGroup
 
