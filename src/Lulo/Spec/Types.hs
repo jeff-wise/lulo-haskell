@@ -101,6 +101,12 @@ data CustomType' =
 instance Hashable CustomType'
 
 
+customTypeLabel :: CustomType' -> String
+customTypeLabel (CustomTypeProduct _) = "product"
+customTypeLabel (CustomTypeSum     _) = "sum"
+customTypeLabel (CustomTypePrim    _) = "primitive"
+
+
 -- Custom Type > Data
 --------------------------------------------------------------------------------
 
@@ -400,6 +406,11 @@ data Constraint' =
 
 
 instance Hashable Constraint'
+
+
+constraintTypeString :: Constraint' -> String
+constraintTypeString (StringOneOf    _) = "string_one_of"
+constraintTypeString (NumGreaterThan _) = "number_greater_than"
 
 
 -- Constraint > String One Of
