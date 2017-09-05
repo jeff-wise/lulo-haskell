@@ -17,15 +17,15 @@ library
   hs-source-dirs:       src
   exposed-modules:      Lulo
                         Lulo.CLI
-                        Lulo.Spec.JSON
+                        Lulo.Schema.JSON
   other-modules:        Lulo.HTML
                         Lulo.HTML.Types
                         Lulo.HTML.Spec.Combinators
                         Lulo.HTML.Spec.Content
                         Lulo.HTML.Spec.Sidebar
                         Lulo.Types
-                        Lulo.Spec.Index
-                        Lulo.Spec.Types
+                        Lulo.Schema.Index
+                        Lulo.Schema.Types
   build-depends:        base >= 4.7 && < 5
                       , aeson
                       , blaze-html
@@ -36,6 +36,7 @@ library
                       , markdown
                       , mtl
                       , optparse-applicative
+                      , scientific
                       , text
                       , unordered-containers
                       , yaml
