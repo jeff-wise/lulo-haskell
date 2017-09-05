@@ -39,6 +39,7 @@ library
                       , scientific
                       , text
                       , unordered-containers
+                      , vector
                       , yaml
   default-language:     Haskell2010
   ghc-options:         -Wall
