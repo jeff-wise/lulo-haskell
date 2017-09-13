@@ -10,7 +10,8 @@
 module Lulo.Schema.Parse where
 
 
-import Lulo.Document
+import Lulo.Doc.Parser
+import Lulo.Doc.Types
 import Lulo.Schema.Index
 import Lulo.Schema.Types
 
@@ -23,10 +24,14 @@ import qualified Data.HashMap.Strict as HM
   , lookup
   )
 import Data.Maybe (catMaybes, listToMaybe)
+-- import Data.Monoid
 import Data.Text (Text)
+-- import qualified Data.Text as T (unpack)
 import Data.Traversable (forM)
-import qualified Data.Vector as Vec (toList)
+import qualified Data.Vector as Vec (toList, imapM)
 import qualified Data.Yaml as Yaml (Value (..))
+
+-- import Debug.Trace (trace)
 
 
 
@@ -60,16 +65,23 @@ valueListParser :: CustomTypeName ->
                    DocParser Doc
 valueListParser customTypeName yamlValue cases path schema schemaDeps =
   case yamlValue of
-    Yaml.Array valueVec -> 
+    Yaml.Array valueVec -> do
       let mType = lookupSchemaType customTypeName (schema:schemaDeps)
-      in  case mType of
-            Just _type -> DocList . Vec.toList <$>
-                            forM valueVec (\itemYamlValue ->
-                              valueParser _type itemYamlValue cases path schema schemaDeps)
-            Nothing    -> Left $ TypeDoesNotExist customTypeName path
-    _          ->
+      case mType of
+        Just _type -> DocList . newListDoc . Vec.toList <$> 
+                        Vec.imapM (itemParser _type) valueVec 
+        Nothing    -> Left $ TypeDoesNotExist (getCustomTypeName customTypeName) path
+    Yaml.Null -> return $ DocList $ ListDoc [] cases path
+    _         ->
       let err = UnexpectedYamlTypeError YamlObject (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err
+  where
+    itemParser :: CustomType -> Int -> Yaml.Value -> DocParser Doc
+    itemParser _type i itemYamlValue = do
+      let newPath = pathWithIndex i path
+      valueParser _type itemYamlValue cases newPath schema schemaDeps
+    newListDoc :: [Doc] -> ListDoc
+    newListDoc hm = ListDoc hm cases path
 
 
 --------------------------------------------------------------------------------
@@ -83,25 +95,31 @@ productParser :: ProductCustomType ->
                  SchemaIndex -> 
                  [SchemaIndex] -> 
                  DocParser Doc
-productParser productType yamlValue _ path schema schemaDeps = 
+productParser productType yamlValue cases path schema schemaDeps = 
   case yamlValue of
     Yaml.Object hm -> fieldsParser hm
     _              ->
       let err = UnexpectedYamlTypeError YamlObject (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err
   where
+    newDictDoc :: HashMap Text Doc -> DictDoc
+    newDictDoc hm = DictDoc hm cases path
     fieldsParser :: HashMap Text Yaml.Value -> DocParser Doc
-    fieldsParser hm = DocDict . HM.fromList <$> 
+    fieldsParser hm = DocDict . newDictDoc . HM.fromList . catMaybes <$> 
                         forM (prodTypeFields productType) (`parseField` hm)
-    parseField :: Field -> HashMap Text Yaml.Value -> DocParser (Text, Doc)
+    parseField :: Field -> HashMap Text Yaml.Value -> DocParser (Maybe (Text, Doc))
     parseField field hm =
-      let keyText = getFieldName$ fieldName field 
+      let keyText = getFieldName $ fieldName field 
           maybeFieldYamlValue = HM.lookup keyText hm 
       in  case maybeFieldYamlValue of
             Just fieldYamlValue -> do 
-              doc <- fieldParser field fieldYamlValue path schema schemaDeps
-              return (keyText, doc)
-            Nothing             -> Left $ FieldMissing (fieldName field) path
+              let newPath = pathWithKey keyText path
+              doc <- fieldParser field fieldYamlValue newPath schema schemaDeps
+              return $ Just (keyText, doc)
+            Nothing             -> 
+              case fieldPresence field of
+                Required -> Left $ FieldMissing (getFieldName $ fieldName field) path
+                Optional -> return Nothing
 
 
 -- Product > Field Parser
@@ -115,13 +133,13 @@ fieldParser :: Field ->
                DocParser Doc
 fieldParser field yamlValue path schema schemaDeps = 
   case fieldValueType field of
-    Prim       primitiveType  -> primitiveParser primitiveType yamlValue path
-    PrimList   primitiveType  -> primitiveListParser primitiveType yamlValue path
+    Prim       primitiveType  -> primitiveParser primitiveType yamlValue [] path
+    PrimList   primitiveType  -> primitiveListParser primitiveType yamlValue [] path
     Custom     customTypeName -> 
       let mType = lookupSchemaType customTypeName (schema:schemaDeps)
       in  case mType of
             Just _type -> valueParser _type yamlValue [] path schema schemaDeps
-            Nothing    -> Left $ TypeDoesNotExist customTypeName path
+            Nothing    -> Left $ TypeDoesNotExist (getCustomTypeName customTypeName) path
     CustomList customTypeName -> valueListParser customTypeName 
                                                  yamlValue 
                                                  []
@@ -147,7 +165,7 @@ sumParser sumType yamlValue cases path schema schemaDeps =
       typeNameYamlValue <- caseTypeNameYamlParser hm (sumTypeName sumType) path
       caseTypeName <- caseTypeNameParser typeNameYamlValue path
       unless (sumTypeHasCase caseTypeName sumType)
-             (Left $ SumTypeDoesNotHaveCase caseTypeName path)
+             (Left $ SumTypeDoesNotHaveCase (getCustomTypeName caseTypeName) path)
       _caseType <- schemaTypeParser caseTypeName (schema:schemaDeps) path
       caseValueYamlValue <- caseValueYamlValueParser hm 
                                                      caseTypeName 
@@ -167,7 +185,7 @@ caseTypeNameYamlParser :: HashMap Text Yaml.Value ->
 caseTypeNameYamlParser hm _typeName path = 
   case HM.lookup "type" hm of
     Just typeYamlValue -> return typeYamlValue
-    Nothing            -> Left $ SumTypeMissingType _typeName path
+    Nothing            -> Left $ SumTypeMissingType (getCustomTypeName _typeName) path
 
 
 caseTypeNameParser :: Yaml.Value -> DocPath -> DocParser CustomTypeName
@@ -189,7 +207,9 @@ caseValueYamlValueParser hm valueTypeName _sumTypeName path = do
   case HM.lookup valueTypeNameText hm of
     Just valueYamlValue -> return valueYamlValue
     Nothing             -> 
-      Left $ SumTypeMissingValue valueTypeName _sumTypeName path 
+      Left $ SumTypeMissingValue (getCustomTypeName valueTypeName) 
+                                 (getCustomTypeName _sumTypeName) 
+                                 path 
 
 
 --------------------------------------------------------------------------------
@@ -203,8 +223,14 @@ synonymParser :: PrimCustomType ->
                  SchemaIndex -> 
                  [SchemaIndex] -> 
                  DocParser Doc
-synonymParser synType yamlValue _ path _ _ = 
-  primitiveParser (primTypeBaseType synType) yamlValue path
+synonymParser synType yamlValue cases path schema schemaDeps = 
+  case primTypeBaseType synType of
+    BaseTypePrim   primValueType  -> primitiveParser primValueType yamlValue cases path
+    BaseTypeCustom customTypeName ->
+      let mType = lookupSchemaType customTypeName (schema:schemaDeps)
+      in  case mType of
+            Just _type -> valueParser _type yamlValue cases path schema schemaDeps
+            Nothing    -> Left $ TypeDoesNotExist (getCustomTypeName customTypeName) path
 
 
 --------------------------------------------------------------------------------
@@ -213,35 +239,42 @@ synonymParser synType yamlValue _ path _ _ =
 
 primitiveParser :: PrimValueType -> 
                    Yaml.Value -> 
+                   [DocCase] -> 
                    DocPath -> 
                    DocParser Doc
-primitiveParser primitiveType yamlValue path = 
+primitiveParser primitiveType yamlValue cases path = 
   case primitiveType of
-    Number  -> numberParser yamlValue path
-    String  -> stringParser yamlValue path
-    Boolean -> booleanParser yamlValue path
+    Number  -> numberParser yamlValue cases path
+    String  -> stringParser yamlValue cases path
+    Boolean -> booleanParser yamlValue cases path
     _       -> Left $ UnknownPrimitiveType path
 
 
-primitiveListParser :: PrimValueType -> Yaml.Value -> DocPath -> DocParser Doc
-primitiveListParser primitiveType yamlValue path =
+primitiveListParser :: PrimValueType -> 
+                       Yaml.Value -> 
+                       [DocCase] -> 
+                       DocPath -> 
+                       DocParser Doc
+primitiveListParser primitiveType yamlValue cases path =
   case yamlValue of
-    Yaml.Array valueVec -> DocList . Vec.toList <$> 
+    Yaml.Array valueVec -> DocList . newListDoc . Vec.toList <$> 
                             forM valueVec (\itemYamlValue ->
-                              primitiveParser primitiveType itemYamlValue path)
+                              primitiveParser primitiveType itemYamlValue cases path)
     _                   ->  
       let err = UnexpectedYamlTypeError YamlArray (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err
-
+  where 
+    newListDoc :: [Doc] -> ListDoc
+    newListDoc hm = ListDoc hm [] path
 
 
 -- Primitive > Number
 --------------------------------------------------------------------------------
 
-numberParser :: Yaml.Value -> DocPath -> DocParser Doc
-numberParser yamlValue path =
+numberParser :: Yaml.Value -> [DocCase] -> DocPath -> DocParser Doc
+numberParser yamlValue cases path =
   case yamlValue of
-    Yaml.Number num -> Right $ DocNumber num
+    Yaml.Number num -> Right $ DocNumber $ NumberDoc num cases path
     _               -> 
       let err = UnexpectedYamlTypeError YamlNumber (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err 
@@ -250,10 +283,10 @@ numberParser yamlValue path =
 -- Primitive > String
 --------------------------------------------------------------------------------
 
-stringParser :: Yaml.Value -> DocPath -> DocParser Doc
-stringParser yamlValue path =
+stringParser :: Yaml.Value -> [DocCase] -> DocPath -> DocParser Doc
+stringParser yamlValue cases path =
   case yamlValue of
-    Yaml.String text -> Right $ DocText text
+    Yaml.String text -> Right $ DocText $ TextDoc text cases path
     _               -> 
       let err = UnexpectedYamlTypeError YamlString (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err
@@ -262,10 +295,10 @@ stringParser yamlValue path =
 -- Primitive > Boolean
 --------------------------------------------------------------------------------
 
-booleanParser :: Yaml.Value -> DocPath -> DocParser Doc
-booleanParser yamlValue path  =
+booleanParser :: Yaml.Value -> [DocCase] -> DocPath -> DocParser Doc
+booleanParser yamlValue cases path  =
   case yamlValue of
-    Yaml.Bool bool -> Right $ DocBoolean bool
+    Yaml.Bool bool -> Right $ DocBoolean $ BooleanDoc bool cases path
     _               -> 
       let err = UnexpectedYamlTypeError YamlBool (yamlType yamlValue) path
       in  Left $ UnexpectedYamlType err
@@ -285,4 +318,4 @@ schemaTypeParser :: CustomTypeName ->
 schemaTypeParser _typeName schemaIndexes path =
   case lookupSchemaType _typeName schemaIndexes of
     Just schemaType -> return schemaType
-    Nothing         -> Left $ TypeDoesNotExist _typeName path
+    Nothing         -> Left $ TypeDoesNotExist (getCustomTypeName _typeName ) path

@@ -12,11 +12,15 @@
 module Lulo.Schema.Types where
 
 
+import Lulo.Doc.Parser
+import Lulo.Doc.Types
+import Lulo.Value
+
 import Data.Hashable
 import Data.HashSet (HashSet)
+import qualified Data.HashSet as HS (fromList)
 import Data.Text (Text)
 import qualified Data.Text as T
-import qualified Data.Yaml as YAML (Value)
 
 import GHC.Generics (Generic)
 
@@ -36,12 +40,32 @@ data Schema = Schema
   }
 
 
+instance FromDocument Schema where
+  fromDocument (DocDict doc) = Schema 
+                          <$> (atParser "version" doc >>= fromDocument)
+                          <*> (atParser "metadata" doc >>= fromDocument)
+                          <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                          <*> (maybeAtParser "root_type" doc >>= fromMaybeDocument)
+                          <*> (atListParser "types" doc >>= 
+                                (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                          <*> (atListParser "constraints" doc >>= 
+                                (\(ListDoc docs _ _) -> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
 -- Specification > Version
 --------------------------------------------------------------------------------
 
 newtype SchemaVersion = SchemaVersion
   { getSchemaVersion :: Text }
   deriving (Eq, Show)
+
+
+instance FromDocument SchemaVersion where
+  fromDocument (DocText doc) = return $ SchemaVersion $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
 -- Specification > Metadata
@@ -53,6 +77,15 @@ data SchemaMetadata = SchemaMetadata
   }
 
 
+instance FromDocument SchemaMetadata where
+  fromDocument (DocDict doc) = SchemaMetadata 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atListParser "authors" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
 -- Specification > Metadata > Name
 --------------------------------------------------------------------------------
 
@@ -60,11 +93,24 @@ newtype SchemaName = SchemaName
   { getSchemaName :: Text }
 
 
+instance FromDocument SchemaName where
+  fromDocument (DocText doc) = return $ SchemaName $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
 -- Specification > Metadata > Author
 --------------------------------------------------------------------------------
 
 newtype SchemaAuthor = SchemaAuthor
-  { getSchemaAuthor :: Text }
+  { schemaAuthorName :: Text 
+  } deriving (Eq, Generic)
+
+
+instance FromDocument SchemaAuthor where
+  fromDocument (DocDict doc) = SchemaAuthor 
+                           <$> atTextParser "name" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
 
 -- Specification > Description
@@ -72,7 +118,14 @@ newtype SchemaAuthor = SchemaAuthor
 
 newtype SchemaDescription = SchemaDescription
   { descOverviewMarkdown :: Text
-  }
+  } deriving (Eq, Generic)
+
+
+instance FromDocument SchemaDescription where
+  fromDocument (DocDict doc) = SchemaDescription 
+                           <$> atTextParser "overview" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
 
 --------------------------------------------------------------------------------
@@ -89,6 +142,16 @@ data CustomType =
 instance Hashable CustomType
 
 
+instance FromDocument CustomType where
+  fromDocument doc = 
+    case docCase doc of
+      "product_type"   -> CustomTypeProduct <$> fromDocument doc
+      "sum_type"       -> CustomTypeSum <$> fromDocument doc
+      "primitive_type" -> CustomTypePrim <$> fromDocument doc
+      _                -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "CustomType" (docPath doc)
+
+
 customTypeLabel :: CustomType -> String
 customTypeLabel (CustomTypeProduct _) = "product"
 customTypeLabel (CustomTypeSum     _) = "sum"
@@ -99,6 +162,18 @@ typeName :: CustomType -> CustomTypeName
 typeName (CustomTypeProduct productType) = prodTypeName productType
 typeName (CustomTypeSum     sumType    ) = sumTypeName sumType
 typeName (CustomTypePrim    primType   ) = primTypeName primType
+
+
+typeLabel :: CustomType -> CustomTypeLabel
+typeLabel (CustomTypeProduct productType) = prodTypeLabel productType
+typeLabel (CustomTypeSum     sumType    ) = sumTypeLabel sumType
+typeLabel (CustomTypePrim    primType   ) = primTypeLabel primType
+
+
+typeDescription :: CustomType -> Maybe CustomTypeDescription
+typeDescription (CustomTypeProduct productType) = prodTypeDescription productType
+typeDescription (CustomTypeSum     sumType    ) = sumTypeDescription sumType
+typeDescription (CustomTypePrim    primType   ) = primTypeDescription primType
 
 
 typeGroup :: CustomType -> Maybe CustomTypeGroup
@@ -118,6 +193,12 @@ newtype CustomTypeName = CustomTypeName
 instance Hashable CustomTypeName
 
 
+instance FromDocument CustomTypeName where
+  fromDocument (DocText doc) = return $ CustomTypeName $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 -- Custom Type > Data > Label
 --------------------------------------------------------------------------------
 
@@ -127,6 +208,12 @@ newtype CustomTypeLabel = CustomTypeLabel
 
 
 instance Hashable CustomTypeLabel
+
+
+instance FromDocument CustomTypeLabel where
+  fromDocument (DocText doc) = return $ CustomTypeLabel $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
 -- Custom Type > Data > Description
@@ -140,6 +227,12 @@ newtype CustomTypeDescription = CustomTypeDescription
 instance Hashable CustomTypeDescription
 
 
+instance FromDocument CustomTypeDescription where
+  fromDocument (DocText doc) = return $ CustomTypeDescription $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 -- Custom Type > Data > Group
 --------------------------------------------------------------------------------
 
@@ -151,6 +244,12 @@ newtype CustomTypeGroup = CustomTypeGroup
 instance Hashable CustomTypeGroup
 
 
+instance FromDocument CustomTypeGroup where
+  fromDocument (DocText doc) = return $ CustomTypeGroup $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 --------------------------------------------------------------------------------
 -- CUSTOM TYPE > PRODUCT
 --------------------------------------------------------------------------------
@@ -160,12 +259,26 @@ data ProductCustomType = ProductCustomType
   , prodTypeLabel        :: CustomTypeLabel
   , prodTypeDescription  :: Maybe CustomTypeDescription
   , prodTypeGroup        :: Maybe CustomTypeGroup
-  , prodTypeYamlExamples :: [YAML.Value]
+  -- , prodTypeYamlExamples :: [YAML.Value]
   , prodTypeFields       :: [Field]
   } deriving (Eq, Generic)
 
 
 instance Hashable ProductCustomType
+
+
+instance FromDocument ProductCustomType where
+  fromDocument (DocDict doc) = ProductCustomType 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
+                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                           <*> (maybeAtParser "group" doc >>= fromMaybeDocument)
+                           -- <*> (atListParser "yaml_examples" doc >>= 
+                           --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atListParser "fields" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
 
 -- Custom Type > Product > Field
@@ -184,6 +297,20 @@ data Field = Field
 instance Hashable Field
 
 
+instance FromDocument Field where
+  fromDocument (DocDict doc) = Field 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "presence" doc >>= fromDocument)
+                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                           <*> (atParser "type" doc >>= fromDocument)
+                           <*> return []
+                           -- <*> (atListParser "constraints" doc >>= 
+                           --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (maybeAtParser "default_value" doc >>= fromMaybeDocument)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
 -- Custom Type > Product > Field > Name
 --------------------------------------------------------------------------------
 
@@ -193,6 +320,12 @@ newtype FieldName = FieldName
 
 
 instance Hashable FieldName
+
+
+instance FromDocument FieldName where
+  fromDocument (DocText doc) = return $ FieldName $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
 -- Custom Type > Product > Field > Description
@@ -206,6 +339,12 @@ newtype FieldDescription = FieldDescription
 instance Hashable FieldDescription
 
 
+instance FromDocument FieldDescription where
+  fromDocument (DocText doc) = return $ FieldDescription $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 -- Custom Type > Product > Field > Default Value
 --------------------------------------------------------------------------------
 
@@ -215,6 +354,12 @@ newtype FieldDefaultValue = FieldDefaultValue
 
 
 instance Hashable FieldDefaultValue
+
+
+instance FromDocument FieldDefaultValue where
+  fromDocument (DocText doc) = return $ FieldDefaultValue $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
 -- Custom Type > Product > Field > Presence
@@ -229,6 +374,17 @@ data FieldPresence =
 instance Hashable FieldPresence
 
 
+instance FromDocument FieldPresence where
+  fromDocument doc@(DocText textDoc) = 
+    case textDocValue textDoc of
+      "optional" -> return Optional
+      "required" -> return Required
+      _          -> Left $ ValueParseErrorUnexpectedValue $ 
+        UnexpectedValueError "presence" (textDocValue textDoc) (docPath doc)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 --------------------------------------------------------------------------------
 -- CUSTOM TYPE > SUM
 --------------------------------------------------------------------------------
@@ -238,12 +394,26 @@ data SumCustomType = SumCustomType
   , sumTypeLabel        :: CustomTypeLabel
   , sumTypeDescription  :: Maybe CustomTypeDescription
   , sumTypeGroup        :: Maybe CustomTypeGroup
-  , sumTypeYamlExamples :: [YAML.Value]
+  -- , sumTypeYamlExamples :: [YAML.Value]
   , sumTypeCases        :: [Case]
   } deriving (Eq, Generic)
 
 
 instance Hashable SumCustomType
+
+
+instance FromDocument SumCustomType where
+  fromDocument (DocDict doc) = SumCustomType 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
+                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                           <*> (maybeAtParser "group" doc >>= fromMaybeDocument)
+                           -- <*> (atListParser "yaml_examples" doc >>= 
+                           --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atListParser "cases" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
 
 sumTypeHasCase :: CustomTypeName -> SumCustomType -> Bool
@@ -265,6 +435,14 @@ data Case = Case
 instance Hashable Case
 
 
+instance FromDocument Case where
+  fromDocument (DocDict doc) = Case 
+                          <$> (atParser "type" doc >>= fromDocument)
+                          <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
 -- Custom Type > Sum > Case > Description
 --------------------------------------------------------------------------------
 
@@ -276,22 +454,62 @@ newtype CaseDescription = CaseDescription
 instance Hashable CaseDescription
 
 
+instance FromDocument CaseDescription where
+  fromDocument (DocText doc) = return $ CaseDescription $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 --------------------------------------------------------------------------------
 -- CUSTOM TYPE > PRIMITIVE
 --------------------------------------------------------------------------------
 
 data PrimCustomType = PrimCustomType
-  { primTypeName         :: CustomTypeName
-  , primTypeLabel        :: CustomTypeLabel
-  , primTypeDescription  :: Maybe CustomTypeDescription
-  , primTypeGroup        :: Maybe CustomTypeGroup
-  , primTypeYamlExamples :: [YAML.Value]
-  , primTypeBaseType    :: PrimValueType
+  { primTypeName        :: CustomTypeName
+  , primTypeLabel       :: CustomTypeLabel
+  , primTypeDescription :: Maybe CustomTypeDescription
+  , primTypeGroup       :: Maybe CustomTypeGroup
+  -- , primTypeYamlExamples :: [YAML.Value]
+  , primTypeBaseType    :: BaseType
   , primTypeConstraints :: [ConstraintName] 
   } deriving (Eq, Generic)
 
 
 instance Hashable PrimCustomType
+
+
+instance FromDocument PrimCustomType where
+  fromDocument (DocDict doc) = PrimCustomType 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
+                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                           <*> (maybeAtParser "group" doc >>= fromMaybeDocument)
+                           -- <*> (atListParser "yaml_examples" doc >>= 
+                           --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atParser "base_type" doc >>= fromDocument)
+                           <*> (atMaybeListParser "constraints" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+
+data BaseType = 
+    BaseTypePrim PrimValueType
+  | BaseTypeCustom CustomTypeName
+  deriving (Eq, Generic)
+
+
+instance Hashable BaseType
+
+
+instance FromDocument BaseType where
+  fromDocument doc = 
+    case docCase doc of
+      "prim_type"   -> BaseTypePrim <$> fromDocument doc
+      "custom_type" -> BaseTypeCustom <$> fromDocument doc
+      _                  -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "BaseType" (docPath doc)
 
 
 --------------------------------------------------------------------------------
@@ -307,6 +525,17 @@ data ValueType =
 
 
 instance Hashable ValueType
+
+
+instance FromDocument ValueType where
+  fromDocument doc = 
+    case docCase doc of
+      "prim_type"        -> Prim <$> fromDocument doc
+      "prim_coll_type"   -> PrimList <$> fromDocument doc
+      "custom_type"      -> Custom <$> fromDocument doc
+      "custom_coll_type" -> CustomList <$> fromDocument doc
+      _                  -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "ValueType" (docPath doc)
 
 
 instance Show ValueType where
@@ -329,6 +558,29 @@ data PrimValueType =
 
 
 instance Hashable PrimValueType
+
+
+instance FromDocument PrimValueType where
+  fromDocument doc@(DocText textDoc) = 
+    case textDocValue textDoc of
+      "any"     -> return Any
+      "number"  -> return Number
+      "string"  -> return String
+      "boolean" -> return Boolean
+      _          -> Left $ ValueParseErrorUnexpectedValue $ 
+        UnexpectedValueError "prim_value_type" (textDocValue textDoc) (docPath doc)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
+  -- fromDocument doc = 
+  --   case docCase doc of
+  --     "any"     -> return Any
+  --     "number"  -> return Number
+  --     "string"  -> return String
+  --     "boolean" -> return Boolean
+  --     _         -> Left $ ValueParseErrorUnknownCase $ 
+  --       UnknownCaseError (docCase doc) "PrimValueType" (docPath doc)
 
 
 instance Show PrimValueType where
@@ -361,25 +613,27 @@ listType parameterType =
 -- CONSTRAINT
 --------------------------------------------------------------------------------
 
-data Constraint = Constraint 
-  { constraintData :: ConstraintData
-  , constraint'    :: Constraint'
-  } deriving (Eq, Generic) 
-
+data Constraint =
+    ConstraintStringOneOf StringOneOfConstraint
+  | ConstraintNumGreaterThan NumGreaterThanConstraint
+  deriving (Eq, Generic)
+ 
 
 instance Hashable Constraint
 
 
--- Constraint > Data 
---------------------------------------------------------------------------------
+instance FromDocument Constraint where
+  fromDocument doc = 
+    case docCase doc of
+      "constraint_string_one_of"    -> ConstraintStringOneOf <$> fromDocument doc
+      "constraint_num_greater_than" -> ConstraintNumGreaterThan <$> fromDocument doc
+      _         -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "Constraint" (docPath doc)
 
-data ConstraintData = ConstraintData
-  { constraintName        :: ConstraintName
-  , constraintDescription :: Maybe ConstraintDescription
-  } deriving (Eq, Generic)
 
-
-instance Hashable ConstraintData
+constraintName :: Constraint -> ConstraintName
+constraintName (ConstraintStringOneOf    c) = stringOneOfName c
+constraintName (ConstraintNumGreaterThan c) = numGreaterThanName c 
 
 
 -- Constraint > Data > Name
@@ -393,6 +647,12 @@ newtype ConstraintName = ConstraintName
 instance Hashable ConstraintName
 
 
+instance FromDocument ConstraintName where
+  fromDocument (DocText doc) = return $ ConstraintName $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
 -- Constraint > Data > Description
 --------------------------------------------------------------------------------
 
@@ -404,42 +664,62 @@ newtype ConstraintDescription = ConstraintDescription
 instance Hashable ConstraintDescription
 
 
--- Constraint
---------------------------------------------------------------------------------
-
-data Constraint' =
-    StringOneOf    StringOneOfConstraint
-  | NumGreaterThan NumberGreaterThanConstraint
-  deriving (Eq, Generic)
+instance FromDocument ConstraintDescription where
+  fromDocument (DocText doc) = return $ ConstraintDescription $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
-instance Hashable Constraint'
-
-
-constraintTypeString :: Constraint' -> String
-constraintTypeString (StringOneOf    _) = "string_one_of"
-constraintTypeString (NumGreaterThan _) = "number_greater_than"
+-- constraintTypeString :: Constraint' -> String
+-- constraintTypeString (StringOneOf    _) = "string_one_of"
+-- constraintTypeString (NumGreaterThan _) = "number_greater_than"
 
 
 -- Constraint > String One Of
 --------------------------------------------------------------------------------
 
-newtype StringOneOfConstraint = StringOneOfConstraint
-  { stringOneOfSet :: HashSet Text
+data StringOneOfConstraint = StringOneOfConstraint
+  { stringOneOfName        :: ConstraintName
+  , stringOneOfDescription :: ConstraintDescription
+  , stringOneOfSet         :: HashSet Text
   } deriving (Eq, Generic)
 
 
 instance Hashable StringOneOfConstraint
 
 
+instance FromDocument StringOneOfConstraint where
+  fromDocument (DocDict doc) = StringOneOfConstraint 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "description" doc >>= fromDocument)
+                           <*> (atListParser "set" doc >>= 
+                                 (\(ListDoc docs _ _) -> HS.fromList <$> mapM fromDocument docs))
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+
 -- Constraint > Number Greater Than
 --------------------------------------------------------------------------------
 
 -- Lower Bound is Exclusive
-newtype NumberGreaterThanConstraint = NumberGreaterThanConstraint
-  { numberGreaterThanLowerBound :: Double
+data NumGreaterThanConstraint = NumGreaterThanConstraint
+  { numGreaterThanName          :: ConstraintName
+  , numGreaterThanDescription   :: ConstraintDescription
+  , numberGreaterThanLowerBound :: Double
   } deriving (Eq, Generic)
 
 
-instance Hashable NumberGreaterThanConstraint
+instance Hashable NumGreaterThanConstraint
+
+
+instance FromDocument NumGreaterThanConstraint where
+  fromDocument (DocDict doc) = NumGreaterThanConstraint 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "description" doc >>= fromDocument)
+                           <*> atDoubleParser "lower_bound" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
 

@@ -89,7 +89,7 @@ schemaIndex schema =
     constraintByNameMap :: [Constraint] -> Map ConstraintName Constraint
     constraintByNameMap = foldl' indexConstraint Map.empty
       where
-        indexConstraint hm c = Map.insert (constraintName $ constraintData c) c hm
+        indexConstraint hm c = Map.insert (constraintName c) c hm
 
     -- | Group -> Custom Type index
     -- Custom type can be put into groups to organize them. For some group, get 

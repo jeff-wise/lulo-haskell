@@ -17,7 +17,7 @@ module Lulo.HTML (
 import Lulo.HTML.Types
 import qualified Lulo.HTML.Spec.Content as Content (html)
 import qualified Lulo.HTML.Spec.Sidebar as Sidebar (html)
-import Lulo.Spec.Index (SpecIndex)
+import Lulo.Schema.Index (SchemaIndex)
 
 import Text.Blaze.Html5 (
     Html
@@ -34,7 +34,7 @@ import qualified Text.Blaze.Html5 as H
 --------------------------------------------------------------------------------
 
 -- | Create a complete HTML document containing the spec information
-specDoc :: SpecIndex -> HtmlSettings -> Html
+specDoc :: SchemaIndex -> HtmlSettings -> Html
 specDoc specIndex settings =
   H.docTypeHtml $ do
     H.head $ do
@@ -51,7 +51,7 @@ specDoc specIndex settings =
 
 
 
-specDiv :: SpecIndex -> HtmlSettings -> Html
+specDiv :: SchemaIndex -> HtmlSettings -> Html
 specDiv specIndex _ =
   H.div ! A.id "specification" $ do
     H.div ! A.id "sidebar" $ Sidebar.html specIndex

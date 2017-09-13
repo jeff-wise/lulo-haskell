@@ -12,12 +12,12 @@ module Lulo.HTML.Spec.Sidebar where
 
 
 import Lulo.HTML.Spec.Combinators (anchorLink)
-import Lulo.Spec.Index (
-    SpecIndex
-  , specIndexVersion
+import Lulo.Schema.Index (
+    SchemaIndex
+  , schemaIndexVersion
   , typesByGroupAsc
   )
-import Lulo.Spec.Types
+import Lulo.Schema.Types
 
 import Data.HashSet (HashSet)
 import Data.Foldable (forM_)
@@ -33,10 +33,10 @@ import qualified Text.Blaze.Html5 as H
 
 
 
-html :: SpecIndex -> Html
+html :: SchemaIndex -> Html
 html specIndex = 
   H.div ! A.id "index" $ do
-    versionHTML $ specIndexVersion specIndex
+    versionHTML $ schemaIndexVersion specIndex
     indexHtml specIndex
     
 
@@ -44,18 +44,18 @@ html specIndex =
 -- VERSION
 --------------------------------------------------------------------------------
 
-versionHTML :: SpecVersion -> Html
+versionHTML :: SchemaVersion -> Html
 versionHTML _version =
   H.div ! A.id "version" $ do
     H.span ! A.class_ "version-label" $ "Version"
-    H.span ! A.class_ "version" $ toHtml $ getSpecVersion _version
+    H.span ! A.class_ "version" $ toHtml $ getSchemaVersion _version
 
 
 --------------------------------------------------------------------------------
 -- INDEX
 --------------------------------------------------------------------------------
 
-indexHtml :: SpecIndex -> Html
+indexHtml :: SchemaIndex -> Html
 indexHtml specIndex = do
   indexSectionHeaderHTML "Introduction"
   indexSectionHeaderHTML "Types"
@@ -76,9 +76,9 @@ indexTypeLinkListItemsHTML = mapM_ typeLinkListItem
     typeLinkListItem = H.li . typeLink
     typeLink _type =  indexLinkHtml
                         -- Link Display Text
-                        (getCustomTypeLabel $ typeLabel $ typeData _type)         
+                        (getCustomTypeLabel $ typeLabel _type)         
                         -- Link Href
-                        (getCustomTypeName $ typeName $ typeData _type) 
+                        (getCustomTypeName $ typeName _type) 
 
 
 -- Index > Components

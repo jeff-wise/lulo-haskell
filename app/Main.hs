@@ -6,9 +6,9 @@
 module Main where
 
 
-import qualified Lulo.CLI as CLI
+import Lulo.CLI (cli)
 
 
 
 main :: IO ()
-main = CLI.run
+main = cli

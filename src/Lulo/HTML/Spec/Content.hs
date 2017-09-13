@@ -11,13 +11,13 @@ module Lulo.HTML.Spec.Content where
 
 
 import Lulo.HTML.Spec.Combinators (objectId)
-import Lulo.Spec.Index (
-    SpecIndex
-  , specIndexDescription
+import Lulo.Schema.Index (
+    SchemaIndex
+  , schemaIndexDescription
   , constraintWithName
   , typesByGroupAsc
   )
-import Lulo.Spec.Types
+import Lulo.Schema.Types
 
 import Control.Monad (unless)
 
@@ -40,9 +40,9 @@ import Text.Markdown (markdown, defaultMarkdownSettings)
 
 
 
-html :: SpecIndex -> Html
+html :: SchemaIndex -> Html
 html specIndex = do
-  maybe (return ()) descriptionHtml $ specIndexDescription specIndex
+  maybe (return ()) descriptionHtml $ schemaIndexDescription specIndex
   typesHtml specIndex
 
 
@@ -50,7 +50,7 @@ html specIndex = do
 -- DESCRIPTION
 --------------------------------------------------------------------------------
 
-descriptionHtml :: SpecDescription -> Html 
+descriptionHtml :: SchemaDescription -> Html 
 descriptionHtml desc =
   H.div ! A.id "description" $ do
     H.div ! A.class_ "definition" $ do
@@ -64,7 +64,7 @@ descriptionHtml desc =
 -- TYPES
 --------------------------------------------------------------------------------
 
-typesHtml :: SpecIndex -> Html
+typesHtml :: SchemaIndex -> Html
 typesHtml specIndex =
   H.div ! A.id "types" $ 
     forM_ (typesByGroupAsc specIndex) $ 
@@ -74,7 +74,7 @@ typesHtml specIndex =
 -- Types > Group
 --------------------------------------------------------------------------------
 
-typeGroupHtml :: SpecIndex -> CustomTypeGroup -> HashSet CustomType -> Html
+typeGroupHtml :: SchemaIndex -> CustomTypeGroup -> HashSet CustomType -> Html
 typeGroupHtml specIndex _group customTypes = do
   typeGroupHeaderHtml _group
   H.div ! A.class_ "group" $
@@ -93,26 +93,26 @@ typeGroupHeaderHtml (CustomTypeGroup _group) =
 -- Types > Type
 --------------------------------------------------------------------------------
 
-typeHtml :: SpecIndex -> CustomType -> Html
+typeHtml :: SchemaIndex -> CustomType -> Html
 typeHtml specIndex customType =
   containerDiv $ do
     H.div ! A.class_ "definition" $ typeDataHtml specIndex customType
     H.div ! A.class_ "example" $ typeExampleHTML
   where
     containerDiv = H.div ! A.id (objectId $ getCustomTypeName $ 
-                                            typeName $ typeData customType)
+                                            typeName customType)
                          ! A.class_ "type"
 
-typeDataHtml :: SpecIndex -> CustomType -> Html
+typeDataHtml :: SchemaIndex -> CustomType -> Html
 typeDataHtml specIndex _type = do
   -- Header
-  typeHeaderHtml (getCustomTypeLabel $ typeLabel $ typeData _type)
+  typeHeaderHtml (getCustomTypeLabel $ typeLabel _type)
   -- Description
-  case typeDescription $ typeData _type of
+  case typeDescription _type of
     Just    desc -> typeDescriptionHtml desc
     Nothing      -> return ()
   -- Fields / Cases
-  case customType' _type of
+  case _type of
     CustomTypeProduct productType -> typeFieldsHtml specIndex productType
     CustomTypeSum     sumType     -> typeCasesHtml sumType
     CustomTypePrim    _           -> return ()
@@ -131,15 +131,15 @@ typeDescriptionHtml (CustomTypeDescription desc) =
 --------------------------------------------------------------------------------
 
 
-typeFieldsHtml :: SpecIndex -> ProductCustomType -> Html
+typeFieldsHtml :: SchemaIndex -> ProductCustomType -> Html
 typeFieldsHtml specIndex productType =
   H.div ! A.class_ "fields" $ do
     H.h4 "Fields"
-    H.ul $ forM_ (typeFields productType) (H.li . fieldHtml specIndex)
+    H.ul $ forM_ (prodTypeFields productType) (H.li . fieldHtml specIndex)
 
 
-fieldHtml :: SpecIndex -> Field -> Html
-fieldHtml specIndex field =
+fieldHtml :: SchemaIndex -> Field -> Html
+fieldHtml _ field =
   fieldContainerDiv $ do
     -- Name
     fieldNameHtml $ fieldName field
@@ -150,7 +150,7 @@ fieldHtml specIndex field =
     -- Description
     fieldDescriptionHtml $ fieldDescription field
     -- Constraints
-    fieldConstraintsHtml (fieldConstraints field) specIndex
+    -- fieldConstraintsHtml (fieldConstraints field) specIndex
     -- Default Value
     fieldDefaultValueHtml $ fieldDefaultValue field
   where
@@ -221,7 +221,7 @@ fieldDefaultValueHtml Nothing                                 = return ()
 -- Types > Type > Field > Constraints
 --------------------------------------------------------------------------------
 
-fieldConstraintsHtml :: [ConstraintName] -> SpecIndex -> Html
+fieldConstraintsHtml :: [ConstraintName] -> SchemaIndex -> Html
 fieldConstraintsHtml constraintNames specIndex = do
   let consts = catMaybes $ fmap (constraintWithName specIndex) 
                                 constraintNames 
@@ -236,10 +236,8 @@ fieldConstraintListItemHTML = H.li . fieldConstraintHTML
 
 
 fieldConstraintHTML :: Constraint -> Html
-fieldConstraintHTML constraint =
-  case constraint' constraint of
-    StringOneOf    c -> stringOneOfConstraintHTML c
-    NumGreaterThan c -> numGreaterThanConstraintHTML c
+fieldConstraintHTML (ConstraintStringOneOf    c) = stringOneOfConstraintHTML c
+fieldConstraintHTML (ConstraintNumGreaterThan c) = numGreaterThanConstraintHTML c
 
 
 -- TYPES > TYPE > CASE
@@ -249,7 +247,7 @@ typeCasesHtml :: SumCustomType -> Html
 typeCasesHtml sumType =
   H.div ! A.class_ "cases" $ do
     H.h3 "Cases"
-    H.ul $ forM_ (typeCases sumType) (H.li . caseHtml)
+    H.ul $ forM_ (sumTypeCases sumType) (H.li . caseHtml)
 
 
 caseHtml :: Case -> Html
@@ -284,7 +282,7 @@ stringOneOfConstraintHTML oneOf =
       (H.span ! A.class_ "choice") . toHtml
 
 
-numGreaterThanConstraintHTML :: NumberGreaterThanConstraint -> Html
+numGreaterThanConstraintHTML :: NumGreaterThanConstraint -> Html
 numGreaterThanConstraintHTML greaterThan = 
   H.div ! A.class_ "constraint-number-greater-than" $ do
     H.span "> "

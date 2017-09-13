@@ -9,16 +9,15 @@ module Lulo.CLI where
 import Lulo.HTML as LuloHtml
 import Lulo.HTML.Types (HtmlSettings (..))
 import Lulo.Types
-import Lulo.Spec.Types (Spec)
-import Lulo.Spec.JSON ()
-import Lulo.Spec.Index (specIndex)
+import Lulo.Schema
+import Lulo.Schema.Types (Schema)
+import Lulo.Schema.Index (schemaIndex)
 
 import Control.Lens
 import Control.Monad (when)
 
 import qualified Data.ByteString.Lazy as BL
 import Data.Monoid ((<>))
-import qualified Data.Yaml as YAML (decodeFileEither)
 
 import qualified Text.Blaze.Html.Renderer.Pretty as Pretty (renderHtml)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
@@ -27,21 +26,15 @@ import Options.Applicative
 
 
 
--- RUN
---------------------------------------------------------------------------------
-
--- | Read and parse the command line arguments
-run :: IO ()
-run = execParser cliParser >>= parseSpec
-
-
 -- COMMAND LINE INTERFACE
 --------------------------------------------------------------------------------
 
--- > Types
---------------------------------------------------------------------------------
+-- | Read and parse the command line arguments
+cli :: IO ()
+cli = execParser cliParser >>= run
 
--- > Parser
+
+-- CLI > Parser
 --------------------------------------------------------------------------------
 
 -- | Top-level command line parser. Adds simple help text to the parameter
@@ -81,37 +74,33 @@ parameterParser = Parameters
 -- PARSE FILE
 --------------------------------------------------------------------------------
 
-parseSpec :: Parameters -> IO ()
-parseSpec parameters = do
-  let isVerbose = (parameters ^. verbosity) == Verbose
-  eSpec <- YAML.decodeFileEither (parameters ^. specFilename)
-  case eSpec of
-    Right spec      -> processSpec spec parameters
-    Left  exception -> do
-      print exception
-      when isVerbose $ 
-        putStrLn $ "Could not be parse " <> (parameters ^. specFilename)
+run :: Parameters -> IO ()
+run parameters = do
+  eSchema <- parseSchemaFile $ parameters ^. specFilename
+  case eSchema of
+    Right schema -> processSchema schema parameters
+    Left  err    -> print err
 
 
-processSpec :: Spec -> Parameters -> IO ()
-processSpec spec parameters = do
+processSchema :: Schema -> Parameters -> IO ()
+processSchema schema parameters = do
   let isVerbose = (parameters ^. verbosity) == Verbose
   -- Show message
   when isVerbose $
-    putStrLn "Spec parsed successfully."
+    putStrLn "Schema parsed successfully."
   -- HTML generation
   case parameters ^. htmlFilename of
     Just filename -> 
-      generateHTMLFile spec filename parameters
+      generateHTMLFile schema filename parameters
     Nothing           -> 
       when isVerbose $
         putStrLn "No HTML file name provided. None will be generated."
 
 
-generateHTMLFile :: Spec -> FilePath -> Parameters -> IO () 
+generateHTMLFile :: Schema -> FilePath -> Parameters -> IO () 
 generateHTMLFile spec filename parameters = do
   let mCSSFilePath = parameters ^. cssFilename
-      _specIndex   = specIndex spec
+      _specIndex   = schemaIndex spec
   if parameters ^. htmlFilePretty
      then writeFile filename $ 
        Pretty.renderHtml $ LuloHtml.specDoc _specIndex 
