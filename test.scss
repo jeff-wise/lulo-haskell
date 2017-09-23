@@ -58,9 +58,10 @@ table {
 
 $sidebar_padding: 22px;
 
-$grey_light: #FDFDFD;
+$grey_light: #FFFFFF;
 $grey_medium: #F4F4F4;
 $grey_dark: #E8E8E8;
+$link_hl: #DDDDDD;
 
 
 
@@ -82,16 +83,18 @@ ul {
 }
 
 a {
-  color: #0e99bb;
+  //color: #5f8d98;
+  color: #106aaf;
 }
 
 a:hover {
-  color: #0a6f88;
+  // color: #0a6f88;
   cursor: pointer;
   text-decoration: underline;
+  //border-bottom: 1px dotted #5F8D98;
 }
 
-#specification {
+#schema {
   display: flex;
   height: 100vh;
 }
@@ -107,17 +110,31 @@ a:hover {
 /***** SIDEBAR *****/
 
 #version {
-  margin-left: 2em;
-  margin-right: 2em;
-  margin-bottom: 1em;
-  background-color: #BDDEBD;
-  padding-left: 0.5em;
-  padding-right: 0.5em;
-  padding-top: 0.6em;
-  padding-bottom: 0.4em;
-  border-radius: 5px;
-  text-align: center;
-  font-size: 0.8em;
+  height: 40px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  position: sticky;
+  top: 0px;
+  font-size: 0.88em;
+  color: #444;
+  background: #535353;
+  z-index: 10000;
+
+  .version-label {
+    color: #E7E7E7;
+  }
+
+  .version {
+    margin-left: 5px;
+    margin-right: 5px;
+    color: #eac2ff;
+  }
+
+  .caret {
+    font-size: 10px;
+    color: #eac2ff;
+  }
 }
 
 #sidebar {
@@ -127,16 +144,15 @@ a:hover {
   margin-right: 0;
   background-color: $grey_dark;
   padding-right: 0.1em;
-  padding-top: 1em;
 }
 
 
 #sidebar::-webkit-scrollbar {
-  width: 0.5em;
+   //width: 0.5em;
 }
 
 #sidebar::-webkit-scrollbar-track {
-  background: #E5E5E5;
+  //background: #BBB;
 }
 
 #sidebar::-webkit-scrollbar-button {
@@ -144,76 +160,157 @@ a:hover {
 
 
 #sidebar::-webkit-scrollbar-track-piece {
-  background: #E5E5E5;
+  //background: #E5E5E5;
 }
 
 #sidebar::-webkit-scrollbar-thumb {
-  background: #C5C5C5;
+  // background: #C5C5C5;
 }
 
 
 #sidebar a {
   text-decoration: none;
+  display: block;
+  flex: 1;
+  color: #555555;
 }
 
 #sidebar a.object {
-  font-size: 0.87em;
-  font-weight: 500;
+  font-size: 0.9em;
+  color: #555555;
 }
-
 
 
 #sidebar a:hover {
   color: #333;
-  text-decoration: underline;
-
+  //text-decoration: underline;
+//  background: #E2E2E2;
 }
 
 #sidebar ul {
+ // background-color: $grey_medium;
+  //padding-bottom: 0.5em;
+  //border-bottom: 1px solid #D4D4D4;
+}
+
+#sidebar ul li {
   padding-left: $sidebar_padding;
-  background-color: $grey_medium;
-  padding-bottom: 0.5em;
-  border-bottom: 1px solid #D4D4D4;
 }
 
 #sidebar ul a {
   color: #484848;
 }
 
-#index h2 {
+
+#introduction-sections.closed {
+  display: none;
+}
+
+#introduction-sections.open {
+  display: block;
+}
+
+#index-types.closed {
+  display: none;
+}
+
+
+#index-types.open {
+  display: block;
+}
+
+
+#index-constraints.closed {
+  display: none;
+}
+
+#index-constraints.open {
+  display: block;
+}
+
+
+#index .section-header {
   padding-left: $sidebar_padding;
-  font-size: 1em;
-  padding-top: 0.7em;
-  padding-bottom: 0.7em;
-  font-weight: 700;
+  font-size: 22px;
+  background: $grey-dark;
+  border-bottom: 1px solid #CCC;
+  position: sticky;
+  top: 40px;
+  color: #222;
+  height: 60px;
+  display: flex;
+  align-items: center;
+
+  .caret {
+    font-size: 0.7em;
+    color: #565656;
+    margin-right: 0.5em;
+  }
+}
+
+#index .section-header:hover {
+  cursor: pointer;
 }
 
 #index h2 a {
   color: #3C3C3C;
 }
 
-#index h3 {
-  font-size: 0.92em;
+#index .subsection-header a {
+  font-size: 20px;
   padding-left: $sidebar_padding;
-  color: #555;
-  padding-bottom: 0.5em;
-  padding-top: 1em;
-  font-weight: 700;
-  background-color: $grey_medium;
-  margin-top: 0.3em;
+  display: flex;
+  align-items: center;
+  height: 100%;
+
+  h3 {
+    color: #515151;
+  }
 }
 
-#index h3 a {
-  color: #515151;
+
+#index .subsection-header {
+  height: 45px;
+}
+
+#index .subsection-header:hover {
+  background: $link_hl;
+  cursor: pointer;
 }
 
 #index li {
-  padding-bottom: 0.4em;
-  padding-top: 0.4em;
+  height: 45px;
+  font-size: 18px;
+}
+
+#index li a {
+  color: #616161;
+  height: 100%;
+  display: flex;
+  align-items: center;
+}
+
+
+#index li:hover {
+  background: $link_hl;
+  cursor: pointer;
 }
 
 .type {
   display: flex;
+}
+
+
+#description .title {
+
+  margin-bottom: 2em;
+
+  h1 {
+    font-size: 1.8em;
+    font-weight: 700;
+    color: #444;
+  }
+
 }
 
 
@@ -239,6 +336,15 @@ a:hover {
   border-bottom: 1px solid #DDD;
   padding-top: 1.5em;
   padding-bottom: 1.5em;
+}
+
+#description h2 {
+  font-size: 1.7em;
+  color: #4C4C4C;
+}
+
+#description .overview {
+  margin-top: 1em;
 }
 
 #content p {
@@ -273,87 +379,192 @@ a:hover {
 }
 
 
-#content h2 {
-  font-size: 1.9em;
-  color: #545454;
-  font-weight: 500;
-  margin-bottom: 0.5em;
+#types .definition > h2 {
+  font-size: 1.4em;
+  color: #717171;
 }
 
 .type .definition h3 {
   font-size: 1.7em;
-  color: #646464;
-  font-weight: 300;
+  color: #515151;
 }
 
-.type .definition > p {
+
+.type .definition .constraints {
+  margin-top: 1em;
+  margin-bottom: 1em;
+  border-top: 1px solid #DDD;
+}
+
+.type .constraint ul {
+  margin-top: 1em;
+}
+
+.type .constraint li {
+  background: $grey_light;
+  border: 1px solid #EAEAEA;
+  border-radius: 3px;
+  padding: 0.4em;
+  display: inline-block;
+}
+
+
+.type .definition p {
   padding-top: 1.1em;
-  padding-bottom: 1.1em;
   color: #555555;
   font-size: 0.92em;
   margin-left: 0.1em;
 }
 
+.type > .definition h4 {
+  color: #FFFFFF;
+  font-size: 0.9em;
+  font-weight: 700;
+  background: #545454;
+  padding: 0.6em;
+  display: inline-block;
+  margin-left: 0.1em;
+  border-radius: 8px;
+  margin-top: 1em;
+
+  .extends {
+    font-weight: 400;
+    color: #EEEEEE;
+  }
+}
+
+.type > .definition h4.constraint {
+  font-weight: 400;
+  color: #dbfed1;
+}
+
+
 .fields ul {
-  margin-top: 0.4em;
+  margin-top: 1em;
 }
 
 .fields {
   margin-top: 0.5em;
 }
 
+
 .field {
   background-color: $grey_light;
-  padding-left: 0.7em;
-  padding-right: 0.7em;
-  padding-top: 0.3em;
-  padding-bottom: 0.3em;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
   margin-bottom: 0.6em;
   border-radius: 2px;
+  //box-shadow: 0 1px 1px #D5D5D5;
+  border: 1px solid #EAEAEA;
+}
+
+
+.field header {
+  display: flex;
+  flex-direction: row;
+  justify-content: space-between;
+  align-items: center;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+  padding-bottom: 0.8em;
+  border-bottom: 1px solid #EFEFEF;
+
+  .name {
+    font-size: 1.05em;
+  }
+
+}
+
+.field > .presence {
+  font-size: 0.9em;
+  color: #777;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+  padding-bottom: 0.8em;
+}
+
+.field > .type {
+  margin-top: 0.8em;
+  font-size: 0.95em;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
 }
 
 
 
-.fields h4 {
+.field > .description {
+  margin-top: 0.8em;
+  font-size: 0.95em;
+  color: #444;
+  padding-left: 0.8em;
+  padding-right: 0.8em;
+}
+
+.cases h4 {
   color: #515151;
   font-size: 1.1em;
   font-weight: 500;
 }
 
 
-.field .property {
-  display: flex;
-  padding-top: 10px;
-  padding-bottom: 10px;
-}
+.case {
+  background-color: $grey_light;
+  padding-top: 0.8em;
+  padding-bottom: 0.8em;
+  border-radius: 2px;
+  margin-bottom: 0.6em;
 
-.field > :not(:last-child) {
-  border-bottom: 1px solid #EEE;
-}
+  .case-type {
+    font-size: 0.95em;
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+  }
 
-.field .property .label {
-  min-width: 140px;
-  color: #888;
-  font-weight: 700;
-  font-size: 0.68em;
-  padding-left: 4px;
-  line-height: 1.65em;
-}
-
-.field .property .value {
-  font-size: 0.93em;
-  color: #333;
-  line-height: 1.3em;
+  .case-description {
+    font-size: 0.95em;
+    color: #444;
+    padding-left: 0.8em;
+    padding-right: 0.8em;
+  }
 }
 
 
-.field .property .value.name {
-  font-weight: 700;
-}
 
-.field .property .value.description {
-  color: #444;
-}
+
+
+// .field .property {
+//   display: flex;
+//   padding-top: 10px;
+//   padding-bottom: 10px;
+// }
+
+// .field > :not(:last-child) {
+//   border-bottom: 1px solid #EEE;
+// }
+
+// .field .property .label {
+//   min-width: 140px;
+//   color: #888;
+//   font-weight: 700;
+//   font-size: 0.68em;
+//   padding-left: 4px;
+//   line-height: 1.65em;
+// }
+
+// .field .property .value {
+//   font-size: 0.93em;
+//   color: #333;
+//   line-height: 1.3em;
+// }
+
+
+// .field .property .value.name {
+//   font-weight: 700;
+// }
+
+// .field .property .value.description {
+//   color: #444;
+// }
 
 
 .type .example {

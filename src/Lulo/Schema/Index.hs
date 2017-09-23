@@ -19,6 +19,7 @@ module Lulo.Schema.Index
   , schemaIndexDescription
   , schemaIndexRootTypeName
   , constraintWithName
+  , sortedConstraintsASC
   , customTypes
   , typesByGroupAsc
   , typeWithName
@@ -44,6 +45,7 @@ import qualified Data.HashSet as Set (
 import Data.Maybe (fromMaybe)
 
 
+-- TODO why not using hashmap? 
 
 --------------------------------------------------------------------------------
 -- INDEX
@@ -117,6 +119,10 @@ customTypes = Map.elems . schemaIndexTypeByName
 
 typesByGroupAsc :: SchemaIndex -> [(CustomTypeGroup, HashSet CustomType)]
 typesByGroupAsc = Map.toAscList . schemaIndexTypesByGroup
+
+
+sortedConstraintsASC :: SchemaIndex -> [Constraint]
+sortedConstraintsASC = fmap snd . Map.toAscList . schemaIndexConstraintByName
 
 
 typeWithName :: SchemaIndex -> CustomTypeName -> Maybe CustomType

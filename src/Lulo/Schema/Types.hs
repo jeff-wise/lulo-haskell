@@ -47,7 +47,7 @@ instance FromDocument Schema where
                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
                           <*> (maybeAtParser "root_type" doc >>= fromMaybeDocument)
                           <*> (atListParser "types" doc >>= 
-                                (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                            (\(ListDoc docs _ _) -> mapM customTypeFromDocument $ zip [0..] docs))
                           <*> (atListParser "constraints" doc >>= 
                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
@@ -72,8 +72,8 @@ instance FromDocument SchemaVersion where
 --------------------------------------------------------------------------------
 
 data SchemaMetadata = SchemaMetadata
-  { specName    :: SchemaName
-  , specAuthors :: [SchemaAuthor]
+  { schemaName    :: SchemaName
+  , schemaAuthors :: [SchemaAuthor]
   }
 
 
@@ -142,6 +142,16 @@ data CustomType =
 instance Hashable CustomType
 
 
+customTypeFromDocument :: (Int, Doc) -> ValueParser CustomType
+customTypeFromDocument (index, doc) =
+  case docCase doc of
+    "product_type"   -> CustomTypeProduct <$> productTypeFromDocument index doc
+    "sum_type"       -> CustomTypeSum <$> sumTypeFromDocument index doc
+    "primitive_type" -> CustomTypePrim <$> synonymTypeFromDocument index doc
+    _                -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "CustomType" (docPath doc)
+
+
 instance FromDocument CustomType where
   fromDocument doc = 
     case docCase doc of
@@ -180,6 +190,12 @@ typeGroup :: CustomType -> Maybe CustomTypeGroup
 typeGroup (CustomTypeProduct productType) = prodTypeGroup productType
 typeGroup (CustomTypeSum     sumType    ) = sumTypeGroup sumType
 typeGroup (CustomTypePrim    primType   ) = primTypeGroup primType
+
+
+typeOrder :: CustomType -> Int
+typeOrder (CustomTypeProduct productType) = prodTypeOrder productType
+typeOrder (CustomTypeSum     sumType    ) = sumTypeOrder sumType
+typeOrder (CustomTypePrim    primType   ) = primTypeOrder primType
 
 
 -- Custom Type > Data > Name
@@ -261,10 +277,18 @@ data ProductCustomType = ProductCustomType
   , prodTypeGroup        :: Maybe CustomTypeGroup
   -- , prodTypeYamlExamples :: [YAML.Value]
   , prodTypeFields       :: [Field]
+  , prodTypeOrder        :: Int
   } deriving (Eq, Generic)
 
 
 instance Hashable ProductCustomType
+
+
+productTypeFromDocument :: Int -> Doc -> ValueParser ProductCustomType
+productTypeFromDocument index doc = do 
+  customType <- fromDocument doc 
+  let customTypeWithIndex = customType { prodTypeOrder = index }
+  return customTypeWithIndex
 
 
 instance FromDocument ProductCustomType where
@@ -277,6 +301,7 @@ instance FromDocument ProductCustomType where
                            --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> (atListParser "fields" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
@@ -368,7 +393,12 @@ instance FromDocument FieldDefaultValue where
 data FieldPresence = 
     Optional 
   | Required
-  deriving (Eq, Generic, Show)
+  deriving (Eq, Generic)
+
+
+instance Show FieldPresence where
+  show Optional = "Optional"
+  show Required = "Required"
 
 
 instance Hashable FieldPresence
@@ -396,10 +426,19 @@ data SumCustomType = SumCustomType
   , sumTypeGroup        :: Maybe CustomTypeGroup
   -- , sumTypeYamlExamples :: [YAML.Value]
   , sumTypeCases        :: [Case]
+  , sumTypeOrder        :: Int
   } deriving (Eq, Generic)
 
 
 instance Hashable SumCustomType
+
+
+sumTypeFromDocument :: Int -> Doc -> ValueParser SumCustomType
+sumTypeFromDocument index doc = do 
+  customType <- fromDocument doc 
+  let customTypeWithIndex = customType { sumTypeOrder = index }
+  return customTypeWithIndex
+
 
 
 instance FromDocument SumCustomType where
@@ -412,6 +451,7 @@ instance FromDocument SumCustomType where
                            --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> (atListParser "cases" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
@@ -472,10 +512,18 @@ data PrimCustomType = PrimCustomType
   -- , primTypeYamlExamples :: [YAML.Value]
   , primTypeBaseType    :: BaseType
   , primTypeConstraints :: [ConstraintName] 
+  , primTypeOrder       :: Int
   } deriving (Eq, Generic)
 
 
 instance Hashable PrimCustomType
+
+
+synonymTypeFromDocument :: Int -> Doc -> ValueParser PrimCustomType
+synonymTypeFromDocument index doc = do 
+  customType <- fromDocument doc 
+  let customTypeWithIndex = customType { primTypeOrder = index }
+  return customTypeWithIndex
 
 
 instance FromDocument PrimCustomType where
@@ -489,6 +537,7 @@ instance FromDocument PrimCustomType where
                            <*> (atParser "base_type" doc >>= fromDocument)
                            <*> (atMaybeListParser "constraints" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 
@@ -510,6 +559,12 @@ instance FromDocument BaseType where
       "custom_type" -> BaseTypeCustom <$> fromDocument doc
       _                  -> Left $ ValueParseErrorUnknownCase $ 
         UnknownCaseError (docCase doc) "BaseType" (docPath doc)
+
+
+baseTypeName :: BaseType -> String
+baseTypeName (BaseTypePrim   primValueType)  = show primValueType
+baseTypeName (BaseTypeCustom customTypeName) = 
+  T.unpack $ getCustomTypeName customTypeName
 
 
 --------------------------------------------------------------------------------
@@ -584,10 +639,10 @@ instance FromDocument PrimValueType where
 
 
 instance Show PrimValueType where
-  show Any      = "any"
-  show Number   = "number"
-  show String   = "string"
-  show Boolean  = "true/false"
+  show Any      = "Any"
+  show Number   = "Number"
+  show String   = "String"
+  show Boolean  = "Boolean"
 
 
 textToPrimType :: Text -> Maybe PrimValueType
@@ -636,6 +691,11 @@ constraintName (ConstraintStringOneOf    c) = stringOneOfName c
 constraintName (ConstraintNumGreaterThan c) = numGreaterThanName c 
 
 
+constraintLabel :: Constraint -> ConstraintLabel
+constraintLabel (ConstraintStringOneOf    c) = stringOneOfLabel c
+constraintLabel (ConstraintNumGreaterThan c) = numGreaterThanLabel c 
+
+
 -- Constraint > Data > Name
 --------------------------------------------------------------------------------
 
@@ -649,6 +709,23 @@ instance Hashable ConstraintName
 
 instance FromDocument ConstraintName where
   fromDocument (DocText doc) = return $ ConstraintName $ textDocValue doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocTextType (docType doc) (docPath doc)
+
+
+-- Constraint > Data > Label
+--------------------------------------------------------------------------------
+
+newtype ConstraintLabel = ConstraintLabel
+  { getConstraintLabel :: Text }
+  deriving (Eq, Generic)
+
+
+instance Hashable ConstraintLabel
+
+
+instance FromDocument ConstraintLabel where
+  fromDocument (DocText doc) = return $ ConstraintLabel $ textDocValue doc
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
@@ -670,18 +747,14 @@ instance FromDocument ConstraintDescription where
     UnexpectedTypeError DocTextType (docType doc) (docPath doc)
 
 
--- constraintTypeString :: Constraint' -> String
--- constraintTypeString (StringOneOf    _) = "string_one_of"
--- constraintTypeString (NumGreaterThan _) = "number_greater_than"
-
-
 -- Constraint > String One Of
 --------------------------------------------------------------------------------
 
 data StringOneOfConstraint = StringOneOfConstraint
   { stringOneOfName        :: ConstraintName
+  , stringOneOfLabel       :: ConstraintLabel
   , stringOneOfDescription :: ConstraintDescription
-  , stringOneOfSet         :: HashSet Text
+  , stringOneOfSet         :: HashSet StringOneOfValue
   } deriving (Eq, Generic)
 
 
@@ -691,11 +764,30 @@ instance Hashable StringOneOfConstraint
 instance FromDocument StringOneOfConstraint where
   fromDocument (DocDict doc) = StringOneOfConstraint 
                            <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
                            <*> (atParser "description" doc >>= fromDocument)
                            <*> (atListParser "set" doc >>= 
                                  (\(ListDoc docs _ _) -> HS.fromList <$> mapM fromDocument docs))
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+data StringOneOfValue = StringOneOfValue
+  { stringOneOfValueText        :: Text 
+  , stringOneOfValueDescription :: Maybe Text
+  } deriving (Eq, Generic)
+
+
+instance Hashable StringOneOfValue
+
+
+instance FromDocument StringOneOfValue where
+  fromDocument (DocDict doc) = StringOneOfValue 
+                           <$> atTextParser "value" doc
+                           <*> atMaybeTextParser "description" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
 
 
 
@@ -705,6 +797,7 @@ instance FromDocument StringOneOfConstraint where
 -- Lower Bound is Exclusive
 data NumGreaterThanConstraint = NumGreaterThanConstraint
   { numGreaterThanName          :: ConstraintName
+  , numGreaterThanLabel         :: ConstraintLabel
   , numGreaterThanDescription   :: ConstraintDescription
   , numberGreaterThanLowerBound :: Double
   } deriving (Eq, Generic)
@@ -716,6 +809,7 @@ instance Hashable NumGreaterThanConstraint
 instance FromDocument NumGreaterThanConstraint where
   fromDocument (DocDict doc) = NumGreaterThanConstraint 
                            <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
                            <*> (atParser "description" doc >>= fromDocument)
                            <*> atDoubleParser "lower_bound" doc
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 

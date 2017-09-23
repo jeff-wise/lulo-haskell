@@ -36,6 +36,7 @@ library
                       , blaze-html
                       , bytestring
                       , containers
+                      , errors
                       , hashable
                       , lens
                       , markdown

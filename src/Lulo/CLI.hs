@@ -7,17 +7,19 @@ module Lulo.CLI where
 
 
 import Lulo.HTML as LuloHtml
-import Lulo.HTML.Types (HtmlSettings (..))
+import Lulo.HTML.Types (HtmlSettings (..), defaultHtmlSettings)
 import Lulo.Types
 import Lulo.Schema
 import Lulo.Schema.Types (Schema)
 import Lulo.Schema.Index (schemaIndex)
 
-import Control.Lens
+import Control.Error.Util (hush)
 import Control.Monad (when)
 
 import qualified Data.ByteString.Lazy as BL
+import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
+import qualified Data.Yaml as Yaml (decodeFileEither)
 
 import qualified Text.Blaze.Html.Renderer.Pretty as Pretty (renderHtml)
 import Text.Blaze.Html.Renderer.Utf8 (renderHtml)
@@ -59,16 +61,19 @@ parameterParser = Parameters
                   <> short 'v' 
                   <> help "Enable verbose mode." )
               <*> optional (strOption
-                  (  long "html-out"
-                  <> metavar "HTML"
-                  <> help "The file path of the generated HTML file." ) )
+                  (  long "html-file" 
+                  <> short 'h' 
+                  <> help "Generate an HTML version of the schema." ) )
               <*> optional (strOption
-                  (  long "html-css"
-                  <> metavar "CSS"
-                  <> help "The file path of a CSS file for the HTML file." ) )
-              <*> switch
-                  (  long "html-pretty" 
-                  <> help "Output pretty printed HTML." )
+                  (  long "html-options"
+                  <> help "The file path of the HTML options yaml file." ) )
+              -- <*> optional (strOption
+              --     (  long "html-css"
+              --     <> metavar "CSS"
+              --     <> help "The file path of a CSS file for the HTML file." ) )
+              -- <*> switch
+              --     (  long "html-pretty" 
+              --     <> help "Output pretty printed HTML." )
 
 
 -- PARSE FILE
@@ -76,7 +81,8 @@ parameterParser = Parameters
 
 run :: Parameters -> IO ()
 run parameters = do
-  eSchema <- parseSchemaFile $ parameters ^. specFilename
+  -- Parse Schema File
+  eSchema <- parseSchemaFile $ parametersSchemaFilename parameters
   case eSchema of
     Right schema -> processSchema schema parameters
     Left  err    -> print err
@@ -84,27 +90,29 @@ run parameters = do
 
 processSchema :: Schema -> Parameters -> IO ()
 processSchema schema parameters = do
-  let isVerbose = (parameters ^. verbosity) == Verbose
+  let isVerbose = parametersVerbosity parameters == Verbose
   -- Show message
-  when isVerbose $
-    putStrLn "Schema parsed successfully."
+  when isVerbose $ putStrLn "Schema parsed successfully."
   -- HTML generation
-  case parameters ^. htmlFilename of
-    Just filename -> 
-      generateHTMLFile schema filename parameters
-    Nothing           -> 
+  case parametersHtmlFilePath parameters of
+    Just filepath -> do
+      -- Try to parse HTML Options
+      let mOptionsFp = parametersHtmlOptionsFilePath parameters
+      htmlSettings <- case mOptionsFp of
+                        Just optionsFp -> fromMaybe defaultHtmlSettings . hush 
+                                            <$> Yaml.decodeFileEither optionsFp
+                        Nothing        -> return defaultHtmlSettings
+      generateHTMLFile schema filepath htmlSettings
+    Nothing       ->
       when isVerbose $
         putStrLn "No HTML file name provided. None will be generated."
 
 
-generateHTMLFile :: Schema -> FilePath -> Parameters -> IO () 
-generateHTMLFile spec filename parameters = do
-  let mCSSFilePath = parameters ^. cssFilename
-      _specIndex   = schemaIndex spec
-  if parameters ^. htmlFilePretty
+generateHTMLFile :: Schema -> FilePath -> HtmlSettings -> IO () 
+generateHTMLFile schema filename htmlSettings =
+  if htmlSettingsPrintPretty htmlSettings
      then writeFile filename $ 
-       Pretty.renderHtml $ LuloHtml.specDoc _specIndex 
-                                            (HtmlSettings mCSSFilePath)
+       Pretty.renderHtml $ LuloHtml.schemaDoc (schemaIndex schema) htmlSettings
      else BL.writeFile filename $ renderHtml $ 
-              LuloHtml.specDoc _specIndex (HtmlSettings mCSSFilePath)
+       LuloHtml.schemaDoc (schemaIndex schema) htmlSettings
 

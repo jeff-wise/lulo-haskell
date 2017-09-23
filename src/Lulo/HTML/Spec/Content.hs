@@ -16,6 +16,7 @@ import Lulo.Schema.Index (
   , schemaIndexDescription
   , constraintWithName
   , typesByGroupAsc
+  , schemaIndexMetadata
   )
 import Lulo.Schema.Types
 
@@ -24,6 +25,7 @@ import Control.Monad (unless)
 import Data.Char (toLower)
 import Data.HashSet (HashSet)
 import Data.Foldable (forM_)
+import Data.Monoid
 import Data.Maybe (catMaybes)
 import Data.Text (Text)
 import qualified Data.Text as T (toLower)
@@ -31,7 +33,7 @@ import qualified Data.Text.Lazy as LT (fromStrict)
 
 import Text.Blaze.Html5 (
     Html
-  , toHtml, toValue
+  , toHtml
   , (!)
   )
 import qualified Text.Blaze.Html5.Attributes as A
@@ -41,22 +43,29 @@ import Text.Markdown (markdown, defaultMarkdownSettings)
 
 
 html :: SchemaIndex -> Html
-html specIndex = do
-  maybe (return ()) descriptionHtml $ schemaIndexDescription specIndex
-  typesHtml specIndex
+html schemaIndex = do
+  descriptionHtml (schemaName $ schemaIndexMetadata schemaIndex) 
+                  (schemaIndexDescription schemaIndex)
+  typesHtml schemaIndex
 
 
 --------------------------------------------------------------------------------
 -- DESCRIPTION
 --------------------------------------------------------------------------------
 
-descriptionHtml :: SchemaDescription -> Html 
-descriptionHtml desc =
+descriptionHtml :: SchemaName -> Maybe SchemaDescription -> Html 
+descriptionHtml (SchemaName _schemaName) mSchemaDesc =
   H.div ! A.id "description" $ do
     H.div ! A.class_ "definition" $ do
-      H.h2 "Introduction"
-      H.div ! A.class_ "overview" $
-        markdown defaultMarkdownSettings $ LT.fromStrict (descOverviewMarkdown desc)
+      H.div ! A.class_ "title" $
+        H.h1 $ toHtml (_schemaName <> " Schema")
+      H.div ! A.class_ "introduction" $ do
+        H.h2 ! A.id "introduction-overview" $ "Overview"
+        case mSchemaDesc of
+          Just schemaDesc ->
+            H.div ! A.class_ "overview" $
+              markdown defaultMarkdownSettings $ LT.fromStrict (descOverviewMarkdown schemaDesc)
+          Nothing         -> return ()
     H.div ! A.class_ "example" $ return ()
 
 
@@ -107,15 +116,11 @@ typeDataHtml :: SchemaIndex -> CustomType -> Html
 typeDataHtml specIndex _type = do
   -- Header
   typeHeaderHtml (getCustomTypeLabel $ typeLabel _type)
-  -- Description
-  case typeDescription _type of
-    Just    desc -> typeDescriptionHtml desc
-    Nothing      -> return ()
   -- Fields / Cases
   case _type of
     CustomTypeProduct productType -> typeFieldsHtml specIndex productType
     CustomTypeSum     sumType     -> typeCasesHtml sumType
-    CustomTypePrim    _           -> return ()
+    CustomTypePrim    synType     -> typeSynonymHtml synType specIndex
 
 
 typeHeaderHtml :: Text -> Html
@@ -130,29 +135,27 @@ typeDescriptionHtml (CustomTypeDescription desc) =
 -- TYPES > TYPE > FIELD
 --------------------------------------------------------------------------------
 
-
 typeFieldsHtml :: SchemaIndex -> ProductCustomType -> Html
-typeFieldsHtml specIndex productType =
+typeFieldsHtml specIndex productType = do
+  -- Description
+  case prodTypeDescription productType of
+    Just    desc -> typeDescriptionHtml desc
+    Nothing      -> return ()
   H.div ! A.class_ "fields" $ do
-    H.h4 "Fields"
+    let numberOfFields = length $ prodTypeFields productType
+    H.h4 $ toHtml $ show numberOfFields <> " Fields"
     H.ul $ forM_ (prodTypeFields productType) (H.li . fieldHtml specIndex)
 
 
 fieldHtml :: SchemaIndex -> Field -> Html
-fieldHtml _ field =
+fieldHtml schemaIndex field =
   fieldContainerDiv $ do
-    -- Name
-    fieldNameHtml $ fieldName field
-    -- Presence
     fieldPresenceHtml $ fieldPresence field
-    -- Type
-    fieldTypeHtml $ fieldValueType field
-    -- Description
+    H.header $ do
+      fieldNameHtml $ fieldName field
+      fieldTypeHtml $ fieldValueType field
     fieldDescriptionHtml $ fieldDescription field
-    -- Constraints
-    -- fieldConstraintsHtml (fieldConstraints field) specIndex
-    -- Default Value
-    fieldDefaultValueHtml $ fieldDefaultValue field
+    constraintsHtml (fieldConstraints field) schemaIndex
   where
     fieldContainerDiv = H.div ! A.class_ "field"
 
@@ -161,14 +164,10 @@ fieldHtml _ field =
 --------------------------------------------------------------------------------
 
 fieldPresenceHtml :: FieldPresence -> Html
-fieldPresenceHtml presence = do
-  let presenceClassString = "presence value " ++ map toLower (show presence)
-      fieldValue = case presence of
-                     Required -> "Yes"
-                     Optional -> "No"
-  H.div ! A.class_ "property" $ do
-    H.span ! A.class_ "label" $ "IS REQUIRED?"
-    H.div ! A.class_ (toValue presenceClassString) $ fieldValue
+fieldPresenceHtml Optional =
+  --let presenceClassString = "presence " ++ map toLower (show presence)
+  H.div ! A.class_ "presence" $ "optional"
+fieldPresenceHtml Required = return ()
 
 
 -- Types > Type > Field > Name
@@ -176,10 +175,7 @@ fieldPresenceHtml presence = do
 
 fieldNameHtml :: FieldName -> Html
 fieldNameHtml name = 
-  H.div ! A.class_ "property" $ do
-    H.span ! A.class_ "label" $ "NAME"
-    H.h5 ! A.class_ "name value" $ 
-      toHtml (getFieldName name)
+  H.div ! A.class_ "name" $ toHtml $ getFieldName name
 
 
 -- Types > Type > Field > Type
@@ -187,10 +183,8 @@ fieldNameHtml name =
 
 fieldTypeHtml :: ValueType -> Html
 fieldTypeHtml fieldType = 
-  H.div ! A.class_ "property" $ do
-    H.span ! A.class_ "label" $ "TYPE"
-    H.div ! A.class_ "type value" $
-      H.a $ toHtml (map toLower $ show fieldType)
+  H.div ! A.class_ "type" $
+    H.a $ toHtml (map toLower $ show fieldType)
 
 
 -- Types > Type > Field > Description
@@ -198,11 +192,9 @@ fieldTypeHtml fieldType =
 
 fieldDescriptionHtml :: Maybe FieldDescription -> Html
 fieldDescriptionHtml (Just desc) = 
-  H.div ! A.class_ "property" $ do
-    H.span ! A.class_ "label" $ "DESCRIPTION"
-    H.div ! A.class_ "description value" $
-      toHtml $ getFieldDesc desc
-fieldDescriptionHtml Nothing                 = return ()
+  H.div ! A.class_ "description" $
+    toHtml $ getFieldDesc desc
+fieldDescriptionHtml Nothing     = return ()
 
 
 -- Types > Type > Field > Default Value
@@ -218,17 +210,16 @@ fieldDefaultValueHtml (Just (FieldDefaultValue defValue)) =
 fieldDefaultValueHtml Nothing                                 = return ()
 
 
--- Types > Type > Field > Constraints
+-- Constraints
 --------------------------------------------------------------------------------
 
-fieldConstraintsHtml :: [ConstraintName] -> SchemaIndex -> Html
-fieldConstraintsHtml constraintNames specIndex = do
+constraintsHtml :: [ConstraintName] -> SchemaIndex -> Html
+constraintsHtml constraintNames specIndex = do
   let consts = catMaybes $ fmap (constraintWithName specIndex) 
                                 constraintNames 
   unless (null consts) $
-    H.div ! A.class_ "constraints" $ do
-      H.h4 "Constraints"
-      H.ul $ mapM_ fieldConstraintListItemHTML consts
+    H.ul ! A.class_ "constraints" $ 
+      mapM_ fieldConstraintListItemHTML consts
 
 
 fieldConstraintListItemHTML :: Constraint -> Html
@@ -244,23 +235,45 @@ fieldConstraintHTML (ConstraintNumGreaterThan c) = numGreaterThanConstraintHTML 
 --------------------------------------------------------------------------------
 
 typeCasesHtml :: SumCustomType -> Html
-typeCasesHtml sumType =
+typeCasesHtml sumType = do
+  -- Description
+  case sumTypeDescription sumType of
+    Just    desc -> typeDescriptionHtml desc
+    Nothing      -> return ()
   H.div ! A.class_ "cases" $ do
-    H.h3 "Cases"
+    H.h4 "Cases"
     H.ul $ forM_ (sumTypeCases sumType) (H.li . caseHtml)
 
 
 caseHtml :: Case -> Html
-caseHtml sumCase = do
-  -- Type
-  H.div ! A.class_ "case-type" $ 
-    toHtml (T.toLower $ getCustomTypeName $ caseType sumCase)
-  -- Description
-  case caseDescription sumCase of
-    Just desc -> 
-      H.div ! A.class_ "case-description" $
-        H.p $ toHtml $ getCaseDescription desc
-    Nothing              -> return ()
+caseHtml sumCase =
+  H.div ! A.class_ "case" $ do
+    -- Type
+    H.div ! A.class_ "case-type" $ 
+      H.a $ toHtml (T.toLower $ getCustomTypeName $ caseType sumCase)
+    -- Description
+    case caseDescription sumCase of
+      Just desc -> 
+        H.div ! A.class_ "case-description" $
+          H.p $ toHtml $ getCaseDescription desc
+      Nothing              -> return ()
+
+
+-- Types > Synonym
+--------------------------------------------------------------------------------
+
+typeSynonymHtml :: PrimCustomType -> SchemaIndex -> Html
+typeSynonymHtml synType schemaIndex =
+  H.div ! A.class_ "synonym" $ do
+    H.h4 $ do
+      H.span ! A.class_ "extends" $ "extends"
+      H.span ! A.class_ "base-type" $ toHtml $ 
+        baseTypeName $ primTypeBaseType synType
+    -- Description
+    case primTypeDescription synType of
+      Just    desc -> typeDescriptionHtml desc
+      Nothing      -> return ()
+    constraintsHtml (primTypeConstraints synType) schemaIndex
 
 
 -- TYPES > TYPE > EXAMPLE
@@ -276,15 +289,20 @@ typeExampleHTML = H.span "example"
 
 stringOneOfConstraintHTML :: StringOneOfConstraint -> Html
 stringOneOfConstraintHTML oneOf =
-  H.div ! A.class_ "constraint-string-one-of" $ do
-    H.span "Must be one of"
-    forM_ (stringOneOfSet oneOf) $ 
-      (H.span ! A.class_ "choice") . toHtml
+  H.div ! A.class_ "constraint constraint-string-one-of" $ do
+    H.h4 ! A.class_ "constraint" $ "Must be one of"
+    H.ul $ 
+      forM_ (stringOneOfSet oneOf) $ \(StringOneOfValue val mDesc) ->
+        H.li $ do
+          H.span ! A.class_ "value" $ toHtml val
+          case mDesc of
+            Just desc -> H.span ! A.class_ "description" $ toHtml desc
+            Nothing   -> return ()
 
 
 numGreaterThanConstraintHTML :: NumGreaterThanConstraint -> Html
 numGreaterThanConstraintHTML greaterThan = 
-  H.div ! A.class_ "constraint-number-greater-than" $ do
+  H.div ! A.class_ "constraint constraint-number-greater-than" $ do
     H.span "> "
     H.span $ toHtml (numberGreaterThanLowerBound greaterThan)
 

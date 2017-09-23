@@ -90,6 +90,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ]
+    , prodTypeOrder       = 0
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "schema_version"
@@ -98,6 +99,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 5
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "schema_name"
@@ -106,6 +108,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 10
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_author"
@@ -122,6 +125,7 @@ types = [
       , fieldDefaultValue = Nothing
       }
       ] 
+    , prodTypeOrder       = 15
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_metadata"
@@ -146,6 +150,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 20
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_description"
@@ -162,6 +167,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 25
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "schema_type"
@@ -186,6 +192,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeOrder       = 30
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "product_type"
@@ -242,6 +249,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 35
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "sum_type"
@@ -298,6 +306,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 40
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "primitive_type"
@@ -354,6 +363,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 45
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "symbol_type"
@@ -410,6 +420,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 50
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_name"
@@ -418,6 +429,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 55
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_label"
@@ -426,6 +438,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 60
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_description"
@@ -434,6 +447,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 65
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_group"
@@ -442,6 +456,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 70
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "field"
@@ -490,6 +505,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 70
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_name"
@@ -498,6 +514,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 75
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_presence"
@@ -506,6 +523,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 80
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_description"
@@ -514,6 +532,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 85
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_default_value"
@@ -522,6 +541,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 90
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "case"
@@ -546,6 +566,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 95
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "case_description"
@@ -554,6 +575,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 100
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "base_type"
@@ -570,6 +592,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeOrder       = 105
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "value_type"
@@ -594,6 +617,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeOrder       = 110
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_type"
@@ -602,6 +626,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
+    , primTypeOrder       = 115
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_coll_type"
@@ -610,6 +635,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
+    , primTypeOrder       = 120
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "custom_type"
@@ -618,6 +644,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
+    , primTypeOrder       = 125
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "custom_coll_type"
@@ -626,6 +653,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
+    , primTypeOrder       = 130
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_value_type"
@@ -634,6 +662,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 135
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "constraint"
@@ -650,6 +679,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeOrder       = 140
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "constraint_name"
@@ -658,6 +688,16 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 145
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "constraint_label"
+    , primTypeLabel       = CustomTypeLabel "A constraint label."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeOrder       = 150
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "constraint_description"
@@ -666,6 +706,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeOrder       = 155
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "constraint_string_one_of"
@@ -682,8 +723,16 @@ types = [
         , fieldDefaultValue = Nothing
         }
       , Field
+        { fieldName         = FieldName "label"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "constraint_label"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
         { fieldName         = FieldName "description"
-        , fieldPresence     = Optional
+        , fieldPresence     = Required
         , fieldDescription  = Nothing
         , fieldValueType    = Custom $ CustomTypeName "constraint_description"
         , fieldConstraints  = []
@@ -693,11 +742,37 @@ types = [
         { fieldName         = FieldName "set"
         , fieldPresence     = Required
         , fieldDescription  = Nothing
-        , fieldValueType    = PrimList String
+        , fieldValueType    = CustomList $ CustomTypeName "constraint_string_one_of_value"
         , fieldConstraints  = []
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 160
+    }
+  , CustomTypeProduct ProductCustomType 
+    { prodTypeName        = CustomTypeName "constraint_string_one_of_value"
+    , prodTypeLabel       = CustomTypeLabel "String one of constraint value."
+    , prodTypeDescription = Nothing
+    , prodTypeGroup       = Nothing
+    , prodTypeFields      = [ 
+        Field
+        { fieldName         = FieldName "value"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Prim String
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
+        { fieldName         = FieldName "description"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = Prim String
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      ] 
+    , prodTypeOrder         = 165
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "constraint_num_greater_than"
@@ -714,8 +789,16 @@ types = [
         , fieldDefaultValue = Nothing
         }
       , Field
+        { fieldName         = FieldName "label"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "constraint_label"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
         { fieldName         = FieldName "description"
-        , fieldPresence     = Optional
+        , fieldPresence     = Required
         , fieldDescription  = Nothing
         , fieldValueType    = Custom $ CustomTypeName "constraint_description"
         , fieldConstraints  = []
@@ -730,10 +813,8 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeOrder         = 170
     }
-
-
-
   ]
 
 

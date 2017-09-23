@@ -99,6 +99,20 @@ atTextParser key (DictDoc hm _ path) =
     Nothing  -> Left $ ValueParseErrorMissingKey $ MissingKeyError key path
 
 
+-- TODO add generic maybe combinator
+
+atMaybeTextParser :: Text -> DictDoc -> ValueParser (Maybe Text)
+atMaybeTextParser key (DictDoc hm _ path) = 
+  case HM.lookup key hm of
+    Just doc -> 
+      case doc of
+        DocText text -> return $ Just $ textDocValue text
+        _            -> Left $ ValueParseErrorUnexpectedType $
+                          UnexpectedTypeError DocTextType (docType doc) path
+    Nothing  -> return Nothing
+
+
+
 
 
 

@@ -7,18 +7,20 @@
 module Lulo 
   ( module Lulo.Schema.Types
   , module Lulo.HTML.Types
-  , specDivHtml
+  , module Lulo.Schema
+  , schemaDivHtml
   ) where
 
 
+import Lulo.Schema
 import Lulo.Schema.Types
 import Lulo.Schema.Index (schemaIndex)
 import Lulo.HTML.Types
-import Lulo.HTML (specDiv)
+import Lulo.HTML (schemaDiv)
 
 import Text.Blaze.Html5 (Html)
 
 
 
-specDivHtml :: Schema -> HtmlSettings -> Html
-specDivHtml schema = specDiv (schemaIndex schema)
+schemaDivHtml :: Schema -> HtmlSettings -> Html
+schemaDivHtml schema = schemaDiv (schemaIndex schema)

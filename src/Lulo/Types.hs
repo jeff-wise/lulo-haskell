@@ -4,16 +4,12 @@
 
 
 {-# LANGUAGE FlexibleInstances #-}
-{-# LANGUAGE FunctionalDependencies #-}
 {-# LANGUAGE MultiParamTypeClasses #-}
-{-# LANGUAGE TemplateHaskell #-}
 {-# LANGUAGE TypeSynonymInstances #-}
 
 
 module Lulo.Types where
 
-
-import Control.Lens.TH (makeFields)
 
 
 
@@ -21,11 +17,12 @@ import Control.Lens.TH (makeFields)
 --------------------------------------------------------------------------------
 
 data Parameters = Parameters 
-  { _parametersSpecFilename   :: FilePath 
-  , _parametersVerbosity      :: Verbosity
-  , _parametersHtmlFilename   :: Maybe FilePath
-  , _parametersCssFilename    :: Maybe FilePath
-  , _parametersHtmlFilePretty :: Bool
+  { parametersSchemaFilename      :: FilePath 
+  , parametersVerbosity           :: Verbosity
+  , parametersHtmlFilePath        :: Maybe FilePath
+  , parametersHtmlOptionsFilePath :: Maybe FilePath
+  -- , _parametersCssFilename    :: Maybe FilePath
+  -- , _parametersHtmlFilePretty :: Bool
   }
 
 
@@ -39,5 +36,3 @@ data Verbosity =
   | Verbose
   deriving (Eq)
 
-
-makeFields ''Parameters
