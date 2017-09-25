@@ -136,6 +136,7 @@ data CustomType =
     CustomTypeProduct ProductCustomType
   | CustomTypeSum     SumCustomType
   | CustomTypePrim    PrimCustomType
+  | CustomTypeSymbol  SymbolCustomType
   deriving (Eq, Generic)
 
 
@@ -148,6 +149,7 @@ customTypeFromDocument (index, doc) =
     "product_type"   -> CustomTypeProduct <$> productTypeFromDocument index doc
     "sum_type"       -> CustomTypeSum <$> sumTypeFromDocument index doc
     "primitive_type" -> CustomTypePrim <$> synonymTypeFromDocument index doc
+    "symbol_type"    -> CustomTypeSymbol <$> symbolTypeFromDocument index doc
     _                -> Left $ ValueParseErrorUnknownCase $ 
         UnknownCaseError (docCase doc) "CustomType" (docPath doc)
 
@@ -166,36 +168,49 @@ customTypeLabel :: CustomType -> String
 customTypeLabel (CustomTypeProduct _) = "product"
 customTypeLabel (CustomTypeSum     _) = "sum"
 customTypeLabel (CustomTypePrim    _) = "primitive"
+customTypeLabel (CustomTypeSymbol  _) = "symbol"
 
 
 typeName :: CustomType -> CustomTypeName
 typeName (CustomTypeProduct productType) = prodTypeName productType
 typeName (CustomTypeSum     sumType    ) = sumTypeName sumType
 typeName (CustomTypePrim    primType   ) = primTypeName primType
+typeName (CustomTypeSymbol  symbolType ) = symTypeName symbolType
 
 
 typeLabel :: CustomType -> CustomTypeLabel
 typeLabel (CustomTypeProduct productType) = prodTypeLabel productType
 typeLabel (CustomTypeSum     sumType    ) = sumTypeLabel sumType
 typeLabel (CustomTypePrim    primType   ) = primTypeLabel primType
+typeLabel (CustomTypeSymbol  symbolType ) = symTypeLabel symbolType
 
 
 typeDescription :: CustomType -> Maybe CustomTypeDescription
 typeDescription (CustomTypeProduct productType) = prodTypeDescription productType
 typeDescription (CustomTypeSum     sumType    ) = sumTypeDescription sumType
 typeDescription (CustomTypePrim    primType   ) = primTypeDescription primType
+typeDescription (CustomTypeSymbol  symbolType ) = symTypeDescription symbolType
 
 
 typeGroup :: CustomType -> Maybe CustomTypeGroup
 typeGroup (CustomTypeProduct productType) = prodTypeGroup productType
 typeGroup (CustomTypeSum     sumType    ) = sumTypeGroup sumType
 typeGroup (CustomTypePrim    primType   ) = primTypeGroup primType
+typeGroup (CustomTypeSymbol  symbolType ) = symTypeGroup symbolType
+
+
+typeCodeExamples :: CustomType -> [CodeExample]
+typeCodeExamples (CustomTypeProduct productType) = prodTypeCodeExamples productType
+typeCodeExamples (CustomTypeSum     sumType    ) = sumTypeCodeExamples sumType
+typeCodeExamples (CustomTypePrim    primType   ) = primTypeCodeExamples primType
+typeCodeExamples (CustomTypeSymbol  symbolType ) = symTypeCodeExamples symbolType
 
 
 typeOrder :: CustomType -> Int
 typeOrder (CustomTypeProduct productType) = prodTypeOrder productType
 typeOrder (CustomTypeSum     sumType    ) = sumTypeOrder sumType
 typeOrder (CustomTypePrim    primType   ) = primTypeOrder primType
+typeOrder (CustomTypeSymbol  symbolType ) = symTypeOrder symbolType
 
 
 -- Custom Type > Data > Name
@@ -277,6 +292,7 @@ data ProductCustomType = ProductCustomType
   , prodTypeGroup        :: Maybe CustomTypeGroup
   -- , prodTypeYamlExamples :: [YAML.Value]
   , prodTypeFields       :: [Field]
+  , prodTypeCodeExamples :: [CodeExample]
   , prodTypeOrder        :: Int
   } deriving (Eq, Generic)
 
@@ -300,6 +316,8 @@ instance FromDocument ProductCustomType where
                            -- <*> (atListParser "yaml_examples" doc >>= 
                            --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> (atListParser "fields" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atMaybeListParser "code_examples" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
@@ -426,6 +444,7 @@ data SumCustomType = SumCustomType
   , sumTypeGroup        :: Maybe CustomTypeGroup
   -- , sumTypeYamlExamples :: [YAML.Value]
   , sumTypeCases        :: [Case]
+  , sumTypeCodeExamples :: [CodeExample]
   , sumTypeOrder        :: Int
   } deriving (Eq, Generic)
 
@@ -450,6 +469,8 @@ instance FromDocument SumCustomType where
                            -- <*> (atListParser "yaml_examples" doc >>= 
                            --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> (atListParser "cases" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atMaybeListParser "code_examples" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
@@ -505,14 +526,14 @@ instance FromDocument CaseDescription where
 --------------------------------------------------------------------------------
 
 data PrimCustomType = PrimCustomType
-  { primTypeName        :: CustomTypeName
-  , primTypeLabel       :: CustomTypeLabel
-  , primTypeDescription :: Maybe CustomTypeDescription
-  , primTypeGroup       :: Maybe CustomTypeGroup
-  -- , primTypeYamlExamples :: [YAML.Value]
-  , primTypeBaseType    :: BaseType
-  , primTypeConstraints :: [ConstraintName] 
-  , primTypeOrder       :: Int
+  { primTypeName         :: CustomTypeName
+  , primTypeLabel        :: CustomTypeLabel
+  , primTypeDescription  :: Maybe CustomTypeDescription
+  , primTypeGroup        :: Maybe CustomTypeGroup
+  , primTypeBaseType     :: BaseType
+  , primTypeConstraints  :: [ConstraintName] 
+  , primTypeCodeExamples :: [CodeExample] 
+  , primTypeOrder        :: Int
   } deriving (Eq, Generic)
 
 
@@ -536,6 +557,8 @@ instance FromDocument PrimCustomType where
                            --       (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> (atParser "base_type" doc >>= fromDocument)
                            <*> (atMaybeListParser "constraints" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> (atMaybeListParser "code_examples" doc >>= 
                                  (\(ListDoc docs _ _) -> mapM fromDocument docs))
                            <*> return 0
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
@@ -565,6 +588,73 @@ baseTypeName :: BaseType -> String
 baseTypeName (BaseTypePrim   primValueType)  = show primValueType
 baseTypeName (BaseTypeCustom customTypeName) = 
   T.unpack $ getCustomTypeName customTypeName
+
+
+--------------------------------------------------------------------------------
+-- CUSTOM TYPE > SYMBOL
+--------------------------------------------------------------------------------
+
+data SymbolCustomType = SymbolCustomType
+  { symTypeName         :: CustomTypeName
+  , symTypeLabel        :: CustomTypeLabel
+  , symTypeDescription  :: Maybe CustomTypeDescription
+  , symTypeGroup        :: Maybe CustomTypeGroup
+  , symTypeSymbol       :: Text
+  , symTypeCodeExamples :: [CodeExample]
+  , symTypeOrder        :: Int
+  } deriving (Eq, Generic)
+
+
+instance Hashable SymbolCustomType
+
+
+symbolTypeFromDocument :: Int -> Doc -> ValueParser SymbolCustomType
+symbolTypeFromDocument index doc = do 
+  customType <- fromDocument doc 
+  let customTypeWithIndex = customType { symTypeOrder = index }
+  return customTypeWithIndex
+
+
+instance FromDocument SymbolCustomType where
+  fromDocument (DocDict doc) = SymbolCustomType 
+                           <$> (atParser "name" doc >>= fromDocument)
+                           <*> (atParser "label" doc >>= fromDocument)
+                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
+                           <*> (maybeAtParser "group" doc >>= fromMaybeDocument)
+                           <*> atTextParser "symbol" doc
+                           <*> (atMaybeListParser "code_examples" doc >>= 
+                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                           <*> return 0
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+--------------------------------------------------------------------------------
+-- CODE EXAMPLE
+--------------------------------------------------------------------------------
+
+data CodeExample = CodeExample
+  { codeExampleLanguage    :: Text
+  , codeExampleCase        :: Maybe Text
+  , codeExampleCode        :: Text
+  , codeExampleDescription :: Text
+  } deriving (Eq, Generic)
+
+
+instance Hashable CodeExample
+
+
+instance FromDocument CodeExample where
+  fromDocument (DocDict doc) = CodeExample 
+                           <$> atTextParser "language" doc
+                           <*> atMaybeTextParser "case" doc
+                           <*> atTextParser "code" doc
+                           <*> atTextParser "description" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+
 
 
 --------------------------------------------------------------------------------

@@ -90,16 +90,18 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ]
-    , prodTypeOrder       = 0
+    , prodTypeCodeExamples  = []
+    , prodTypeOrder         = 0
     }
   , CustomTypePrim PrimCustomType
-    { primTypeName        = CustomTypeName "schema_version"
-    , primTypeLabel       = CustomTypeLabel "The schema version."
-    , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
-    , primTypeBaseType    = BaseTypePrim String
-    , primTypeConstraints = []
-    , primTypeOrder       = 5
+    { primTypeName         = CustomTypeName "schema_version"
+    , primTypeLabel        = CustomTypeLabel "The schema version."
+    , primTypeDescription  = Nothing
+    , primTypeGroup        = Nothing
+    , primTypeBaseType     = BaseTypePrim String
+    , primTypeConstraints  = []
+    , primTypeCodeExamples = []
+    , primTypeOrder        = 5
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "schema_name"
@@ -108,6 +110,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 10
     }
   , CustomTypeProduct ProductCustomType 
@@ -125,6 +128,7 @@ types = [
       , fieldDefaultValue = Nothing
       }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder       = 15
     }
   , CustomTypeProduct ProductCustomType 
@@ -150,6 +154,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 20
     }
   , CustomTypeProduct ProductCustomType 
@@ -167,6 +172,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 25
     }
   , CustomTypeSum SumCustomType 
@@ -192,6 +198,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeCodeExamples  = []
     , sumTypeOrder       = 30
     }
   , CustomTypeProduct ProductCustomType 
@@ -248,7 +255,16 @@ types = [
         , fieldConstraints  = []
         , fieldDefaultValue = Nothing
         }
+      , Field
+        { fieldName         = FieldName "code_examples"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = CustomList $ CustomTypeName "code_example"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 35
     }
   , CustomTypeProduct ProductCustomType 
@@ -305,7 +321,16 @@ types = [
         , fieldConstraints  = []
         , fieldDefaultValue = Nothing
         }
+      , Field
+        { fieldName         = FieldName "code_examples"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = CustomList $ CustomTypeName "code_example"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 40
     }
   , CustomTypeProduct ProductCustomType 
@@ -362,7 +387,16 @@ types = [
         , fieldConstraints  = []
         , fieldDefaultValue = Nothing
         }
+      , Field
+        { fieldName         = FieldName "code_examples"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = CustomList $ CustomTypeName "code_example"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 45
     }
   , CustomTypeProduct ProductCustomType 
@@ -419,7 +453,16 @@ types = [
         , fieldConstraints  = []
         , fieldDefaultValue = Nothing
         }
+      , Field
+        { fieldName         = FieldName "code_examples"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = CustomList $ CustomTypeName "code_example"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
       ] 
+    , prodTypeCodeExamples  = []
     , prodTypeOrder         = 50
     }
   , CustomTypePrim PrimCustomType
@@ -429,6 +472,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 55
     }
   , CustomTypePrim PrimCustomType
@@ -438,6 +482,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 60
     }
   , CustomTypePrim PrimCustomType
@@ -447,6 +492,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 65
     }
   , CustomTypePrim PrimCustomType
@@ -456,6 +502,89 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
+    , primTypeOrder       = 70
+    }
+  , CustomTypeProduct ProductCustomType 
+    { prodTypeName        = CustomTypeName "code_example"
+    , prodTypeLabel       = CustomTypeLabel "A code example."
+    , prodTypeDescription = Nothing
+    , prodTypeGroup       = Nothing
+    , prodTypeFields      = [ 
+        Field
+        { fieldName         = FieldName "language"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "code_example_language"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
+        { fieldName         = FieldName "case"
+        , fieldPresence     = Optional
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "code_example_case"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
+        { fieldName         = FieldName "code"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "code_example_code"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      , Field
+        { fieldName         = FieldName "description"
+        , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "code_example_description"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+      ] 
+    , prodTypeCodeExamples = []
+    , prodTypeOrder         = 67
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "code_example_language"
+    , primTypeLabel       = CustomTypeLabel "The code language."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeCodeExamples = []
+    , primTypeOrder       = 70
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "code_example_case"
+    , primTypeLabel       = CustomTypeLabel "The purpose of the code."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeCodeExamples = []
+    , primTypeOrder       = 70
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "code_example_code"
+    , primTypeLabel       = CustomTypeLabel "The code."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeCodeExamples = []
+    , primTypeOrder       = 70
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "code_example_description"
+    , primTypeLabel       = CustomTypeLabel "Description of the code."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 70
     }
   , CustomTypeProduct ProductCustomType 
@@ -505,6 +634,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples = []
     , prodTypeOrder         = 70
     }
   , CustomTypePrim PrimCustomType
@@ -514,6 +644,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 75
     }
   , CustomTypePrim PrimCustomType
@@ -523,6 +654,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 80
     }
   , CustomTypePrim PrimCustomType
@@ -532,6 +664,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 85
     }
   , CustomTypePrim PrimCustomType
@@ -541,6 +674,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 90
     }
   , CustomTypeProduct ProductCustomType 
@@ -566,6 +700,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples = []
     , prodTypeOrder         = 95
     }
   , CustomTypePrim PrimCustomType
@@ -575,6 +710,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 100
     }
   , CustomTypeSum SumCustomType 
@@ -592,6 +728,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeCodeExamples = []
     , sumTypeOrder       = 105
     }
   , CustomTypeSum SumCustomType 
@@ -617,6 +754,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeCodeExamples = []
     , sumTypeOrder       = 110
     }
   , CustomTypePrim PrimCustomType
@@ -626,6 +764,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 115
     }
   , CustomTypePrim PrimCustomType
@@ -635,6 +774,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 120
     }
   , CustomTypePrim PrimCustomType
@@ -644,6 +784,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 125
     }
   , CustomTypePrim PrimCustomType
@@ -653,6 +794,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 130
     }
   , CustomTypePrim PrimCustomType
@@ -662,6 +804,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 135
     }
   , CustomTypeSum SumCustomType 
@@ -679,6 +822,7 @@ types = [
         , caseDescription = Nothing
         }
       ] 
+    , sumTypeCodeExamples = []
     , sumTypeOrder       = 140
     }
   , CustomTypePrim PrimCustomType
@@ -688,6 +832,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 145
     }
   , CustomTypePrim PrimCustomType
@@ -697,6 +842,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 150
     }
   , CustomTypePrim PrimCustomType
@@ -706,6 +852,7 @@ types = [
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
+    , primTypeCodeExamples = []
     , primTypeOrder       = 155
     }
   , CustomTypeProduct ProductCustomType 
@@ -747,6 +894,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples = []
     , prodTypeOrder         = 160
     }
   , CustomTypeProduct ProductCustomType 
@@ -772,6 +920,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples = []
     , prodTypeOrder         = 165
     }
   , CustomTypeProduct ProductCustomType 
@@ -813,6 +962,7 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
+    , prodTypeCodeExamples = []
     , prodTypeOrder         = 170
     }
   ]

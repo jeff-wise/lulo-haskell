@@ -86,6 +86,7 @@ a {
   //color: #5f8d98;
 //  color: #106aaf;
   text-decoration: none;
+  cursor: pointer;
 }
 
 
@@ -129,6 +130,10 @@ a {
       color: #E8E8E8;
       font-size: 0.85em;
       padding: 0.55em;
+    }
+
+    .button:hover {
+      cursor: pointer;
     }
 
     .button.selected {
@@ -515,6 +520,10 @@ a {
 
   a {
     color: #106aaf;
+  }
+
+  a:hover {
+    text-decoration: underline;
   }
 
 }

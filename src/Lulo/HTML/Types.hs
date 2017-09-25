@@ -15,21 +15,23 @@ import Data.Aeson
 
 
 data HtmlSettings = HtmlSettings
-  { htmlSettingsCssFilePath :: FilePath
+  { htmlSettingsCssPaths    :: [FilePath]
+  , htmlSettingsJsPaths     :: [FilePath]
   , htmlSettingsPrintPretty :: Bool
   }
 
 
 defaultHtmlSettings :: HtmlSettings
 defaultHtmlSettings = HtmlSettings 
-  { htmlSettingsCssFilePath = "style.css"
+  { htmlSettingsCssPaths    = ["schema.css"]
+  , htmlSettingsJsPaths     = ["schema.js"]
   , htmlSettingsPrintPretty = False
   }
 
 
-
 instance FromJSON HtmlSettings where
   parseJSON = withObject "HtmlSettings" $ \v -> HtmlSettings
-      <$> v .:? "css_filepath" .!= "style.css"
+      <$> v .:? "css_paths"    .!= ["schema.css"]
+      <*> v .:? "js_paths"     .!= ["schema.js"]
       <*> v .:? "print_pretty" .!= False
 

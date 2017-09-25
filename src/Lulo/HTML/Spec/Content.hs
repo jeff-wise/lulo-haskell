@@ -14,6 +14,7 @@ import Lulo.HTML.Spec.Combinators (objectId)
 import Lulo.Schema.Index (
     SchemaIndex
   , schemaIndexDescription
+  , schemaIndexExampleLanguages
   , constraintWithName
   , typesByGroupAsc
   , schemaIndexMetadata
@@ -31,9 +32,10 @@ import Data.Text (Text)
 import qualified Data.Text as T (toLower)
 import qualified Data.Text.Lazy as LT (fromStrict)
 
-import Text.Blaze.Html5 (
-    Html
-  , toHtml
+import Text.Blaze.Html (preEscapedToHtml)
+import Text.Blaze.Html5 
+  ( Html
+  , toHtml, toValue
   , (!)
   )
 import qualified Text.Blaze.Html5.Attributes as A
@@ -44,9 +46,30 @@ import Text.Markdown (markdown, defaultMarkdownSettings)
 
 html :: SchemaIndex -> Html
 html schemaIndex = do
+  headerHtml schemaIndex
   descriptionHtml (schemaName $ schemaIndexMetadata schemaIndex) 
                   (schemaIndexDescription schemaIndex)
   typesHtml schemaIndex
+
+
+--------------------------------------------------------------------------------
+-- HEADER
+--------------------------------------------------------------------------------
+
+headerHtml :: SchemaIndex -> Html
+headerHtml schemaIndex = 
+  H.header ! A.class_ "languages" $ do
+    H.div ! A.class_ "definition" $ return ()
+    H.div ! A.class_ "example" $ do
+      let languages = schemaIndexExampleLanguages schemaIndex 
+      H.div ! A.class_ "buttons" $ 
+        forM_ languages languageButtonHtml
+
+
+languageButtonHtml :: Text -> Html
+languageButtonHtml language = do
+  let classes = "button" <> (if T.toLower language == "yaml" then " selected" else "") :: Text
+  H.div ! A.class_ (toValue classes) $ toHtml language
 
 
 --------------------------------------------------------------------------------
@@ -103,10 +126,10 @@ typeGroupHeaderHtml (CustomTypeGroup _group) =
 --------------------------------------------------------------------------------
 
 typeHtml :: SchemaIndex -> CustomType -> Html
-typeHtml specIndex customType =
+typeHtml schemaIndex customType =
   containerDiv $ do
-    H.div ! A.class_ "definition" $ typeDataHtml specIndex customType
-    H.div ! A.class_ "example" $ typeExampleHTML
+    H.div ! A.class_ "definition" $ typeDataHtml schemaIndex customType
+    H.div ! A.class_ "example" $ typeExampleHtml (typeCodeExamples customType) "yaml"
   where
     containerDiv = H.div ! A.id (objectId $ getCustomTypeName $ 
                                             typeName customType)
@@ -121,6 +144,7 @@ typeDataHtml specIndex _type = do
     CustomTypeProduct productType -> typeFieldsHtml specIndex productType
     CustomTypeSum     sumType     -> typeCasesHtml sumType
     CustomTypePrim    synType     -> typeSynonymHtml synType specIndex
+    CustomTypeSymbol  _           -> return ()
 
 
 typeHeaderHtml :: Text -> Html
@@ -129,7 +153,8 @@ typeHeaderHtml = H.h3 . toHtml
 
 typeDescriptionHtml :: CustomTypeDescription -> Html
 typeDescriptionHtml (CustomTypeDescription desc) = 
-  H.p ! A.class_ "description" $ toHtml desc
+  H.p ! A.class_ "description" $
+    markdown defaultMarkdownSettings $ LT.fromStrict desc
    
 
 -- TYPES > TYPE > FIELD
@@ -279,9 +304,29 @@ typeSynonymHtml synType schemaIndex =
 -- TYPES > TYPE > EXAMPLE
 --------------------------------------------------------------------------------
 
-typeExampleHTML :: Html
-typeExampleHTML = H.span "example"
+typeExampleHtml :: [CodeExample] -> Text -> Html
+typeExampleHtml codeExamples defaultLanguage = 
+  H.div ! A.class_ "examples" $ do
+    H.h3 "Examples"
+    useCaseHtml codeExamples defaultLanguage
 
+
+useCaseHtml :: [CodeExample] -> Text -> Html
+useCaseHtml codeExamples defaultLanguage = 
+  H.div ! A.class_ "use_case" $
+    forM_ codeExamples $ exampleHtml defaultLanguage
+
+
+exampleHtml :: Text -> CodeExample -> Html
+exampleHtml defaultLanguage codeExample = do
+  let language = T.toLower $ codeExampleLanguage codeExample
+      classes = language
+                <> " example"
+                <> (if defaultLanguage == language then " selected" else "")
+  H.div ! A.class_ (toValue classes) $ do
+    H.h4 $ toHtml $ codeExampleDescription codeExample
+    --H.pre $ H.code $ toHtml $ codeExampleCode codeExample 
+    preEscapedToHtml $ "<pre><code>" <> codeExampleCode codeExample <> "</pre></code>"
 
 
 -- CONSTRAINTS

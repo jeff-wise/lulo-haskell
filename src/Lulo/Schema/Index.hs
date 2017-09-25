@@ -18,6 +18,7 @@ module Lulo.Schema.Index
   , schemaIndexMetadata
   , schemaIndexDescription
   , schemaIndexRootTypeName
+  , schemaIndexExampleLanguages
   , constraintWithName
   , sortedConstraintsASC
   , customTypes
@@ -27,6 +28,9 @@ module Lulo.Schema.Index
 
 
 import Lulo.Schema.Types
+
+import Control.Category ((>>>))
+import Control.Monad (msum)
 
 import Data.Foldable (foldl')
 import Data.Map.Lazy (Map)
@@ -38,11 +42,14 @@ import qualified Data.Map.Lazy as Map (
   , toAscList
   )
 import Data.HashSet (HashSet)
-import qualified Data.HashSet as Set (
-    singleton
+import qualified Data.HashSet as Set
+  ( singleton, empty
+  , insert
   , union
   )
 import Data.Maybe (fromMaybe)
+
+import Data.Text (Text)
 
 
 -- TODO why not using hashmap? 
@@ -61,6 +68,7 @@ data SchemaIndex = SchemaIndex
   , schemaIndexTypeByName        :: Map CustomTypeName CustomType
   , schemaIndexConstraintByName  :: Map ConstraintName Constraint
   , schemaIndexTypesByGroup      :: Map CustomTypeGroup (HashSet CustomType)
+  , schemaIndexExampleLanguages  :: HashSet Text
   }
 
 
@@ -78,6 +86,7 @@ schemaIndex schema =
     (customTypeByNameMap $ schemaTypes schema)
     (constraintByNameMap $ schemaConstraints schema)
     (groupToTypesMap $ schemaTypes schema)
+    (exampleLanguageSet $ schemaTypes schema)
 
   where
                 
@@ -103,6 +112,16 @@ schemaIndex schema =
           let groupName = fromMaybe (CustomTypeGroup "no_group") 
                                     (typeGroup _customType)
           in  Map.insertWith Set.union groupName (Set.singleton _customType) hm
+
+    exampleLanguageSet :: [CustomType] -> HashSet Text
+    exampleLanguageSet = fmap typeLanguages
+                     >>> msum
+                     >>> foldl' (flip Set.insert) Set.empty
+      where
+        typeLanguages = fmap codeExampleLanguage . typeCodeExamples
+                         -- fmap (fmap codeExampleLanguage . typeCodeExamples)
+                     -- >>> msum
+                     -- >>> foldl' (flip Set.insert) Set.empty
 
 
 --------------------------------------------------------------------------------

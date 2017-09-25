@@ -11,6 +11,7 @@
 module Lulo.HTML (
     schemaDoc
   , schemaDiv
+  , scriptText
   ) where
 
 
@@ -18,6 +19,8 @@ import Lulo.HTML.Types
 import qualified Lulo.HTML.Spec.Content as Content (html)
 import qualified Lulo.HTML.Spec.Sidebar as Sidebar (html)
 import Lulo.Schema.Index (SchemaIndex)
+
+import Data.Foldable (forM_)
 
 import Data.Monoid ((<>))
 
@@ -42,14 +45,22 @@ schemaDoc schemaIndex settings =
   H.docTypeHtml $ do
     H.head $ do
       H.title "Schema"
-      H.link ! A.rel "stylesheet" 
-             ! A.type_ "text/css" 
-             ! A.href (toValue $ htmlSettingsCssFilePath settings)
+      forM_ (htmlSettingsCssPaths settings) $ \path ->
+        H.link ! A.rel "stylesheet" 
+               ! A.type_ "text/css" 
+               ! A.href (toValue path)
+      -- Default Fonts
       H.link ! A.rel "stylesheet"
              ! A.href "https://fonts.googleapis.com/css?family=Lato:400,700"
+      H.link ! A.rel "stylesheet"
+             ! A.href "https://fonts.googleapis.com/css?family=Inconsolata"
+      H.script $ preEscapedToHtml scriptText
     H.body $ do
       schemaDiv schemaIndex settings
+      forM_ (htmlSettingsJsPaths settings) $ \path ->
+        H.script ! A.src (toValue path) $ return ()
       H.script $ preEscapedToHtml scriptText
+
 
 
 schemaDiv :: SchemaIndex -> HtmlSettings -> Html
@@ -57,7 +68,6 @@ schemaDiv schemaIndex _ =
   H.div ! A.id "schema" $ do
     H.div ! A.id "sidebar" $ Sidebar.html schemaIndex
     H.div ! A.id "content" $ Content.html schemaIndex
-
 
 
 scriptText :: String
@@ -100,3 +110,4 @@ scriptText =
   <> "         }" 
   <> "    });"              
   <> "});"
+  <> "if (hljs != null) hljs.initHighlightingOnLoad();"
