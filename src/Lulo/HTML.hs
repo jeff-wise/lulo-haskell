@@ -54,7 +54,6 @@ schemaDoc schemaIndex settings =
              ! A.href "https://fonts.googleapis.com/css?family=Lato:400,700"
       H.link ! A.rel "stylesheet"
              ! A.href "https://fonts.googleapis.com/css?family=Inconsolata"
-      H.script $ preEscapedToHtml scriptText
     H.body $ do
       schemaDiv schemaIndex settings
       forM_ (htmlSettingsJsPaths settings) $ \path ->
@@ -73,6 +72,7 @@ schemaDiv schemaIndex _ =
 scriptText :: String
 scriptText = 
      "document.addEventListener('DOMContentLoaded', function(event) { "
+  <> "    if (hljs != null) { hljs.initHighlightingOnLoad() };"
   <> "    document.querySelector('.section-header.types').addEventListener('click', function(e) {"
   <> "         var indexTypesElement = document.querySelector('#index-types');   " 
   <> "         if (indexTypesElement.classList.contains('open')) {" 
@@ -110,4 +110,3 @@ scriptText =
   <> "         }" 
   <> "    });"              
   <> "});"
-  <> "if (hljs != null) hljs.initHighlightingOnLoad();"

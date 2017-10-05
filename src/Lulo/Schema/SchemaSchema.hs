@@ -536,8 +536,17 @@ types = [
         , fieldDefaultValue = Nothing
         }
       , Field
-        { fieldName         = FieldName "description"
+        { fieldName         = FieldName "title"
         , fieldPresence     = Required
+        , fieldDescription  = Nothing
+        , fieldValueType    = Custom $ CustomTypeName "code_example_title"
+        , fieldConstraints  = []
+        , fieldDefaultValue = Nothing
+        }
+
+      , Field
+        { fieldName         = FieldName "description"
+        , fieldPresence     = Optional
         , fieldDescription  = Nothing
         , fieldValueType    = Custom $ CustomTypeName "code_example_description"
         , fieldConstraints  = []
@@ -570,6 +579,16 @@ types = [
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_code"
     , primTypeLabel       = CustomTypeLabel "The code."
+    , primTypeDescription = Nothing
+    , primTypeGroup       = Nothing
+    , primTypeBaseType    = BaseTypePrim String
+    , primTypeConstraints = []
+    , primTypeCodeExamples = []
+    , primTypeOrder       = 70
+    }
+  , CustomTypePrim PrimCustomType
+    { primTypeName        = CustomTypeName "code_example_title"
+    , primTypeLabel       = CustomTypeLabel "Title of the example."
     , primTypeDescription = Nothing
     , primTypeGroup       = Nothing
     , primTypeBaseType    = BaseTypePrim String

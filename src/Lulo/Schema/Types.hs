@@ -637,7 +637,8 @@ data CodeExample = CodeExample
   { codeExampleLanguage    :: Text
   , codeExampleCase        :: Maybe Text
   , codeExampleCode        :: Text
-  , codeExampleDescription :: Text
+  , codeExampleTitle       :: Text
+  , codeExampleDescription :: Maybe Text
   } deriving (Eq, Generic)
 
 
@@ -649,7 +650,8 @@ instance FromDocument CodeExample where
                            <$> atTextParser "language" doc
                            <*> atMaybeTextParser "case" doc
                            <*> atTextParser "code" doc
-                           <*> atTextParser "description" doc
+                           <*> atTextParser "title" doc
+                           <*> atMaybeTextParser "description" doc
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 

@@ -110,11 +110,11 @@ a {
 //  height: 40px;
 }
 
-#content > header > .example {
+#content > header > .display {
   // height: 40px;
 }
 
-#content > header > .example {
+#content > header > .display {
 
   .buttons {
     position: fixed;
@@ -264,7 +264,7 @@ a {
   display: flex;
   align-items: center;
   height: 100%;
-  color: #4C4C4C;
+  color: #464646;
 }
 
 #index .subsection-header a:hover {
@@ -291,7 +291,7 @@ a {
   height: 100%;
   display: flex;
   align-items: center;
-  color: #575757;
+  color: #616161;
 }
 
 
@@ -328,7 +328,7 @@ a {
 }
 
 
-#content .example {
+#content .display {
   width: 48%;
   background-color: #2A2E32;
 }
@@ -349,14 +349,18 @@ a {
   color: #4C4C4C;
 }
 
-#description .overview {
+#description .introduction .overview {
   margin-top: 1em;
+
+  p:not(:first-child) {                                                                                                                                                                                    
+    margin-top: 1em;                                                                                                                                                                                       
+  }   
 }
 
 #content p {
   font-size: 0.95em;
   color: #3C3C3C;
-  line-height: 1.6em;
+  line-height: 1.3em;
 }
 
 .type .definition {
@@ -367,6 +371,7 @@ a {
 
 .type .examples {
   padding-left: 1.5em;
+  padding-right: 1.5em;
 
   h3 {
     color: #9A9A9A;
@@ -395,7 +400,7 @@ a {
       padding: 1.5em;
       color: #BBB;
       margin-top: 0.6em;
-      font-family: Inconsolota, monospace;
+      font-family: 'Source Code Pro', monospace;
       font-size: 0.87em;
       line-height: 1.3em;
       border-radius: 0.2em;
@@ -418,7 +423,7 @@ a {
   padding-top: 20px;
 }
 
-.section-header .example {
+.section-header .display {
   background-color: #252525;
   padding-top: 20px;
 }
@@ -434,6 +439,29 @@ a {
   color: #515151;
 }
 
+
+
+#types figcaption {                                                                                                                                                                                        
+  background: #FEFEFE;                                                                                                                                                                                     
+  padding: 1em 2em;                                                                                                                                                                                        
+  font-size: 0.9em;                                                                                                                                                                                        
+  line-height: 1.1em;                                                                                                                                                                                      
+  color: #4A4A4A;                                                                                                                                                                                          
+  margin-top: 1em;                                                                                                                                                                                         
+}                                                                                                                                                                                                          
+                                                                                                                                                                                                           
+                                                                                                                                                                                                           
+#types figure {                                                                                                                                                                                            
+  margin-top: 1em;                                                                                                                                                                                         
+  width: 100%;                                                                                                                                                                                             
+  background: none;                                                                                                                                                                                        
+  display: flex;                                                                                                                                                                                           
+  flex-direction: column;                                                                                                                                                                                  
+  align-items: center;                                                                                                                                                                                     
+  padding-top: 1em;                                                                                                                                                                                        
+  border: 1px solid #D8D8D8;                                                                                                                                                                               
+}          
+          
 
 .type .definition .constraints {
   margin-top: 1em;
@@ -478,9 +506,20 @@ a {
   }
 }
 
+
+.type > .definition .description h4 {                                                                                                                                                                      
+  background: none;                                                                                                                                                                                        
+  color: #444;                                                                                                                                                                                             
+  font-weight: normal;                                                                                                                                                                                     
+  padding: 0;                                                                                                                                                                                              
+  font-size: 1.3em;                                                                                                                                                                                        
+  margin: 1em 0 0 0;                                                                                                                                                                                       
+}   
+
 .type > .definition h4.constraint {
   font-weight: 400;
-  color: #dbfed1;
+  // color: #dbfed1;
+  color: #f9b9fa;
 }
 
 
@@ -518,6 +557,18 @@ a {
     font-size: 1.05em;
   }
 
+  .type {
+    color: #555;
+
+    span {                                                                                                                                                                                                       color: #555;
+      margin-right: 0.3em;  
+    }  
+
+    .primitive {
+      color: #49ae74;
+    }
+  }
+
   a {
     color: #106aaf;
   }
@@ -551,6 +602,7 @@ a {
   color: #444;
   padding-left: 0.8em;
   padding-right: 0.8em;
+  line-height: 1.1em;
 }
 
 .cases h4 {
@@ -620,7 +672,7 @@ a {
 // }
 
 
-.type .example {
+.type .display {
   width: 48%;
   background-color: #252525;
 }

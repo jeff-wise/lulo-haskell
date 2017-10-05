@@ -23,13 +23,14 @@ import Lulo.Schema.Types
 
 import Control.Monad (unless)
 
-import Data.Char (toLower)
 import Data.HashSet (HashSet)
+import qualified Data.HashSet as HS (toList)
 import Data.Foldable (forM_)
+import Data.List (sortOn)
 import Data.Monoid
 import Data.Maybe (catMaybes)
 import Data.Text (Text)
-import qualified Data.Text as T (toLower)
+import qualified Data.Text as T (cons, toLower)
 import qualified Data.Text.Lazy as LT (fromStrict)
 
 import Text.Blaze.Html (preEscapedToHtml)
@@ -60,7 +61,7 @@ headerHtml :: SchemaIndex -> Html
 headerHtml schemaIndex = 
   H.header ! A.class_ "languages" $ do
     H.div ! A.class_ "definition" $ return ()
-    H.div ! A.class_ "example" $ do
+    H.div ! A.class_ "display" $ do
       let languages = schemaIndexExampleLanguages schemaIndex 
       H.div ! A.class_ "buttons" $ 
         forM_ languages languageButtonHtml
@@ -89,7 +90,7 @@ descriptionHtml (SchemaName _schemaName) mSchemaDesc =
             H.div ! A.class_ "overview" $
               markdown defaultMarkdownSettings $ LT.fromStrict (descOverviewMarkdown schemaDesc)
           Nothing         -> return ()
-    H.div ! A.class_ "example" $ return ()
+    H.div ! A.class_ "display" $ return ()
 
 
 --------------------------------------------------------------------------------
@@ -107,10 +108,11 @@ typesHtml specIndex =
 --------------------------------------------------------------------------------
 
 typeGroupHtml :: SchemaIndex -> CustomTypeGroup -> HashSet CustomType -> Html
-typeGroupHtml specIndex _group customTypes = do
+typeGroupHtml specIndex _group customTypeSet = do
   typeGroupHeaderHtml _group
+  let sortedTypes = sortOn typeName $ HS.toList customTypeSet
   H.div ! A.class_ "group" $
-    forM_ customTypes $ typeHtml specIndex
+    forM_ sortedTypes $ typeHtml specIndex
 
 
 typeGroupHeaderHtml :: CustomTypeGroup -> Html
@@ -118,7 +120,7 @@ typeGroupHeaderHtml (CustomTypeGroup _group) =
   containerDiv $ do
     H.div ! A.class_ "definition" $
       H.h2 ! A.id (objectId _group) $ toHtml _group
-    H.div ! A.class_ "example" $ ""
+    H.div ! A.class_ "display" $ ""
   where
     containerDiv = H.div ! A.class_ "section-header"
 
@@ -129,7 +131,7 @@ typeHtml :: SchemaIndex -> CustomType -> Html
 typeHtml schemaIndex customType =
   containerDiv $ do
     H.div ! A.class_ "definition" $ typeDataHtml schemaIndex customType
-    H.div ! A.class_ "example" $ typeExampleHtml (typeCodeExamples customType) "yaml"
+    H.div ! A.class_ "display" $ typeExampleHtml (typeCodeExamples customType) "yaml"
   where
     containerDiv = H.div ! A.id (objectId $ getCustomTypeName $ 
                                             typeName customType)
@@ -148,12 +150,12 @@ typeDataHtml specIndex _type = do
 
 
 typeHeaderHtml :: Text -> Html
-typeHeaderHtml = H.h3 . toHtml
+typeHeaderHtml _typeName = H.h3 ! A.id (objectId _typeName) $ toHtml _typeName
 
 
 typeDescriptionHtml :: CustomTypeDescription -> Html
 typeDescriptionHtml (CustomTypeDescription desc) = 
-  H.p ! A.class_ "description" $
+  H.div ! A.class_ "description" $
     markdown defaultMarkdownSettings $ LT.fromStrict desc
    
 
@@ -209,7 +211,21 @@ fieldNameHtml name =
 fieldTypeHtml :: ValueType -> Html
 fieldTypeHtml fieldType = 
   H.div ! A.class_ "type" $
-    H.a $ toHtml (map toLower $ show fieldType)
+    case fieldType of
+      Prim primValueType -> H.span ! A.class_ "primitive" $ toHtml $ show primValueType
+      PrimList primValueType ->
+        H.div ! A.class_ "primitive" $ do
+          H.span "list of"
+          H.span $ toHtml $ show primValueType
+      Custom customTypeName -> do
+        let _typeName = getCustomTypeName customTypeName
+        H.a ! A.href (toValue $ T.cons '#' _typeName) $ toHtml _typeName
+      CustomList customTypeName -> do
+        let _typeName = getCustomTypeName customTypeName
+        H.div $ do
+          H.span "list of"
+          H.a ! A.href (toValue $ T.cons '#' _typeName) $ toHtml _typeName
+
 
 
 -- Types > Type > Field > Description
@@ -324,7 +340,10 @@ exampleHtml defaultLanguage codeExample = do
                 <> " example"
                 <> (if defaultLanguage == language then " selected" else "")
   H.div ! A.class_ (toValue classes) $ do
-    H.h4 $ toHtml $ codeExampleDescription codeExample
+    H.h4 $ toHtml $ codeExampleTitle codeExample
+    case codeExampleDescription codeExample of
+      Just desc -> H.p $ toHtml desc
+      Nothing   -> return ()
     --H.pre $ H.code $ toHtml $ codeExampleCode codeExample 
     preEscapedToHtml $ "<pre><code>" <> codeExampleCode codeExample <> "</pre></code>"
 
