@@ -75,7 +75,8 @@ indexHtml specIndex = do
   H.div ! A.class_ "section" $ do
     indexSectionHeaderHTML "Constraints"
     H.div ! A.id "index-constraints" ! A.class_ "closed" $
-      forM_ (sortedConstraintsASC specIndex) indexConstraintLinkHtml
+      H.ul $ 
+        forM_ (sortedConstraintsASC specIndex) indexConstraintLinkHtml
 
 
 indexTypesGroupHTML :: CustomTypeGroup -> HashSet CustomType -> Html
@@ -88,7 +89,7 @@ indexTypesGroupHTML (CustomTypeGroup _group) customTypeSet =
 
 indexConstraintLinkHtml :: Constraint -> Html
 indexConstraintLinkHtml constraint = 
-  H.a $ H.h5 $ toHtml $ getConstraintLabel $ constraintLabel constraint
+  H.li $ H.a $ H.h5 $ toHtml $ getConstraintLabel $ constraintLabel constraint
 
 
 indexTypeLinkListItemsHTML :: HashSet CustomType -> Html

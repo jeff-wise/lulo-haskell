@@ -282,7 +282,8 @@ typeCasesHtml sumType = do
     Just    desc -> typeDescriptionHtml desc
     Nothing      -> return ()
   H.div ! A.class_ "cases" $ do
-    H.h4 "Cases"
+    let numberOfCases = length $ sumTypeCases sumType
+    H.h4 $ toHtml $ show numberOfCases <> " Cases"
     H.ul $ forM_ (sumTypeCases sumType) (H.li . caseHtml)
 
 
@@ -290,8 +291,7 @@ caseHtml :: Case -> Html
 caseHtml sumCase =
   H.div ! A.class_ "case" $ do
     -- Type
-    H.div ! A.class_ "case-type" $ 
-      H.a $ toHtml (T.toLower $ getCustomTypeName $ caseType sumCase)
+    caseTypeHtml $ caseType sumCase
     -- Description
     case caseDescription sumCase of
       Just desc -> 
@@ -300,6 +300,13 @@ caseHtml sumCase =
       Nothing              -> return ()
 
 
+caseTypeHtml :: CustomTypeName -> Html
+caseTypeHtml customTypeName = 
+  H.div ! A.class_ "type" $ do
+    let _typeName = getCustomTypeName customTypeName
+    H.a ! A.href (toValue $ T.cons '#' _typeName) $ toHtml _typeName
+
+    
 -- Types > Synonym
 --------------------------------------------------------------------------------
 

@@ -1,6 +1,0 @@
-css_paths:
-- assets/css/test.css
-- assets/css/highlight.css
-js_paths:
-- assets/js/highlight.js
-print_pretty: true
