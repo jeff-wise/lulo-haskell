@@ -1,6 +1,8 @@
 
 
-<p align="center">[Lulo Schema Format][lulo-html-documentation]</p>
+<p align="center">
+  <a href="https://jeff-wise.github.io/lulo-haskell/schemaschema/">Lulo Schema Format</a>
+</p>
 
 ------------------------------------------------------------------------
 
