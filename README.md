@@ -1,7 +1,7 @@
 
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="85%" />
+  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="70%" />
 </div>
 
 <h3 align="center">
@@ -33,18 +33,18 @@ clients will be able to create their own programs and use your data by
 just using Lulo and the data schemas. Plus, clients can use the 
 generated HTML documentation as a guide.
 
-#### Lulo is Defined With Lulo
-
-Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
-documents, and Lulo parses them the same way that it parse any other document. 
-This implies the existence of a **schema schema** which defines 
-the format of all schemas.
-
-The schema schema is hard-coded into the implementation because the 
-schema schema is a schema, and we cannot parse a schema without the schema schema.
-
-Since Lulo itself is a schema, it's HTML documentation can be
-automatically generated -- it is self-documenting.
+> #### Lulo is Defined With Lulo
+>
+> Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
+> documents, and Lulo parses them the same way that it parse any other document. 
+> This implies the existence of a **schema schema** which defines 
+> the format of all schemas.
+>
+> The schema schema is hard-coded into the implementation because the 
+> schema schema is a schema, and we cannot parse a schema without the schema schema.
+>
+> Since Lulo itself is a schema, it's HTML documentation can be
+> automatically generated -- it is self-documenting.
 
 ### Contents
 
