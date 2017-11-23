@@ -1,6 +1,6 @@
 
 
-link here | [Lulo Schema Format][lulo-html-documentation] | [Example Schema][example-schema]
+<p align="center">[Lulo Schema Format][lulo-html-documentation]</p>
 
 ------------------------------------------------------------------------
 
@@ -27,6 +27,8 @@ clients will be able to create their own programs and use your data by
 just using Lulo and the data schemas. Plus, clients can use the 
 generated HTML documentation as a guide.
 
+##### How Does It Work?
+
 Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
 documents, and Lulo parses them the same way that it parse any other document. 
 This implies the existence of a **schema schema** which defines 
@@ -37,9 +39,6 @@ schema schema is a schema, and we cannot parse a schema without the schema schem
 
 Since Lulo itself is a schema, it's HTML documentation can be
 automatically generated -- it is self-documenting.
-
-### [View Lulo HTML Documention][lulo-html-documentation]
-
 
 - [Getting Started](#getting-started)
   - [Define a Schema](#define-a-schema)
