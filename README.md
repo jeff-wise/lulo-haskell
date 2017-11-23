@@ -1,7 +1,7 @@
 
 
-<div text-align="center">
-  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" />
+<div align="center">
+  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="85%" />
 </div>
 
 <h3 align="center">
