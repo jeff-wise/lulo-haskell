@@ -1,8 +1,12 @@
 
 
-<p align="center">
+<div text-align="center">
+  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" />
+</div>
+
+<h3 align="center">
   <a href="https://jeff-wise.github.io/lulo-haskell/schemaschema/">Lulo Schema Format</a>
-</p>
+</h3>
 
 ------------------------------------------------------------------------
 
@@ -29,7 +33,7 @@ clients will be able to create their own programs and use your data by
 just using Lulo and the data schemas. Plus, clients can use the 
 generated HTML documentation as a guide.
 
-##### How Does It Work?
+#### Lulo is Defined With Lulo
 
 Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
 documents, and Lulo parses them the same way that it parse any other document. 
@@ -42,6 +46,8 @@ schema schema is a schema, and we cannot parse a schema without the schema schem
 Since Lulo itself is a schema, it's HTML documentation can be
 automatically generated -- it is self-documenting.
 
+### Contents
+
 - [Getting Started](#getting-started)
   - [Define a Schema](#define-a-schema)
   - [Parse Documents](#parse-documents)
@@ -52,7 +58,6 @@ automatically generated -- it is self-documenting.
     - [Products](#products)
     - [Sums](#sums)
   - [Constraints](#constraints)
-
 
 ## Getting Started
 
