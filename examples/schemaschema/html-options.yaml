@@ -1,0 +1,4 @@
+css_paths:
+- css/schema.css
+- css/highlight.css
+print_pretty: true
