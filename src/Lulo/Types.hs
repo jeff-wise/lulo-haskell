@@ -71,6 +71,7 @@ data Verbosity =
 data SchemaSchemaParameters = SchemaSchemaParameters
   { ssParamsCommand             :: SchemaSchemaCommand
   , ssParamsHtmlOptionsFilePath :: Maybe FilePath
+  , ssParamsHtmlFilePath        :: Maybe FilePath
   } deriving (Eq, Show)
 
 

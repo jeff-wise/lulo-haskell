@@ -18,6 +18,7 @@ import Control.Monad.Except (runExceptT, throwError)
 import Control.Monad.IO.Class (liftIO)
 
 import qualified Data.ByteString.Lazy as BL
+import Data.Maybe (fromMaybe)
 import Data.Monoid ((<>))
 import qualified Data.Yaml as Yaml (decodeFileEither)
 
@@ -105,6 +106,10 @@ ssParser = CmdSchemaSchema <$> params
       <*> optional (strOption
           (  long "html-options"
           <> help "The file path of the HTML options file." ) )
+      <*> optional (strOption
+          (  long "html-file"
+          <> short 'f'
+          <> help "The file path of the generated HTML file." ) )
 
 
 -- RUN
@@ -148,7 +153,7 @@ schemaSchemaCommand params =
     generateSchemaHtmlFile :: CLI ()
     generateSchemaHtmlFile = do
       opts <- parseHtmlOptions $ ssParamsHtmlOptionsFilePath params
-      let genHtmlFilePath = "schema.html"
+      let genHtmlFilePath = fromMaybe "schema.html" $ ssParamsHtmlFilePath params
       writeHtmlFile schemaSchema genHtmlFilePath opts
 
 

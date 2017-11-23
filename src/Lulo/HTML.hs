@@ -50,10 +50,9 @@ schemaDoc schemaIndex settings =
                ! A.type_ "text/css" 
                ! A.href (toValue path)
       -- Default Fonts
-      H.link ! A.rel "stylesheet"
-             ! A.href "https://fonts.googleapis.com/css?family=Lato:400,700"
-      H.link ! A.rel "stylesheet"
-             ! A.href "https://fonts.googleapis.com/css?family=Inconsolata"
+      forM_ (htmlSettingsGoogleFonts settings) $ \font ->
+        H.link ! A.rel "stylesheet"
+               ! A.href ("https://fonts.googleapis.com/css?family=" <> toValue font)
     H.body $ do
       schemaDiv schemaIndex settings
       forM_ (htmlSettingsJsPaths settings) $ \path ->
