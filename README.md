@@ -4,11 +4,16 @@
   <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="60%" />
 </div>
 
+
+<h3 style="float:left">
+  View the <a href="https://jeff-wise.github.io/lulo-haskell/schemaschema/">Schema Docs</a>
+</h3>
+
+<h3 style="float:right">
+  <a href="https://github.com/jeff-wise/lulo-kotlin">Kotlin</a>
+</h3>
+
 ------------------------------------------------------------------------
-
-View the [Schema Documentation][lulo-html-documentation]
-
-Other Languages: [Kotlin][lulo-kotlin]
 
 Lulo is a data specification format. It allows you define *schemas*. With schemas, 
 you can define the structure of your data with a collection of 
