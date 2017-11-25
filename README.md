@@ -5,11 +5,11 @@
 </div>
 
 
-<h3 style="float:left">
+<h3 align="left">
   View the <a href="https://jeff-wise.github.io/lulo-haskell/schemaschema/">Schema Docs</a>
 </h3>
 
-<h3 style="float:right">
+<h3 align="right">
   <a href="https://github.com/jeff-wise/lulo-kotlin">Kotlin</a>
 </h3>
 
