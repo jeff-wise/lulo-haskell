@@ -1,19 +1,17 @@
 
 
 <div align="center">
-  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="60%" />
+  <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="50%" />
 </div>
 
 
-<h3 align="left">
+<h4>
   View the <a href="https://jeff-wise.github.io/lulo-haskell/schemaschema/">Schema Docs</a>
+</h4>
 
-  <span align="right">
-    <a href="https://github.com/jeff-wise/lulo-kotlin">Kotlin</a>
-  </span>
-
-</h3>
-
+<h4>
+  Other languages: <a href="https://github.com/jeff-wise/lulo-kotlin">Kotlin</a>
+</h4>
 
 ------------------------------------------------------------------------
 
