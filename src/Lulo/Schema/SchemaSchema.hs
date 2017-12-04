@@ -23,7 +23,7 @@ schemaSchema = Schema
   { schemaVersion      = SchemaVersion "1.0"
   , schemaMetadata     = SchemaMetadata (SchemaName "schema-schema") []
   , schemaDescription  = Nothing
-  , schemaRootTypeName = Just $ CustomTypeName "schema"
+  , schemaRootTypeName = CustomTypeName "schema"
   , schemaTypes        = types
   , schemaConstraints  = constraints
   }
@@ -83,7 +83,7 @@ types = [
         }
       , Field
         { fieldName         = FieldName "constraints"
-        , fieldPresence     = Required
+        , fieldPresence     = Optional
         , fieldDescription  = Nothing
         , fieldValueType    = CustomList $ CustomTypeName "constraint"
         , fieldConstraints  = []

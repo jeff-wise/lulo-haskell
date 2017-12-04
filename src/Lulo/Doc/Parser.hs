@@ -13,6 +13,7 @@ module Lulo.Doc.Parser where
 import Lulo.Doc.Types
 import Lulo.Value
 
+import Data.Foldable (foldl')
 import Data.Monoid
 import Data.Scientific (toRealFloat)
 import Data.Text (Text)
@@ -99,8 +100,6 @@ atTextParser key (DictDoc hm _ path) =
     Nothing  -> Left $ ValueParseErrorMissingKey $ MissingKeyError key path
 
 
--- TODO add generic maybe combinator
-
 atMaybeTextParser :: Text -> DictDoc -> ValueParser (Maybe Text)
 atMaybeTextParser key (DictDoc hm _ path) = 
   case HM.lookup key hm of
@@ -112,21 +111,18 @@ atMaybeTextParser key (DictDoc hm _ path) =
     Nothing  -> return Nothing
 
 
-
-
-
-
-
--- atTextListParser :: Text -> DictDoc -> ValueParser [Text]
--- atTextListParser key (DictDoc hm _ path) = 
---   case HM.lookup key hm of
---     Just doc -> 
---       case doc of
---         DocList listDoc -> return listDoc
---         _               -> Left $ ValueParseErrorUnexpectedType $
---                              UnexpectedTypeError DocListType (docType doc) path
---     Nothing  -> Left $ ValueParseErrorMissingKey $ MissingKeyError key path
-
+atTextListParser :: Text -> DictDoc -> ValueParser [Text]
+atTextListParser key (DictDoc hm _ path) = 
+  case HM.lookup key hm of
+    Just doc -> 
+      case doc of
+        DocList docs -> 
+          let docText texts (DocText textDoc) = textDocValue textDoc : texts
+              docText texts _                 = texts 
+          in  return $ foldl' docText [] $ listDocDocs docs
+        _            -> Left $ ValueParseErrorUnexpectedType $
+                          UnexpectedTypeError DocTextType (docType doc) path
+    Nothing  -> Left $ ValueParseErrorMissingKey $ MissingKeyError key path
 
 
 

@@ -1,0 +1,28 @@
+name: Chess Quiz
+description: A quiz about chess.
+questions:
+- type: question_multiple_choice
+  question_multiple_choice:
+    points: 1
+    question: How many squares are on a chess board?
+    choices:
+    - '36'
+    - '50'
+    - '64'
+    - '100'
+- type: question_open_ended
+  question_open_ended:
+    points: 2
+    question: 'What is your favorite chess opening and why?'
+- type: question_matching
+  question_matching:
+    points: 2
+    question: 'Match the piece to its movement pattern.'
+    left_side: 
+      - 'Rook'
+      - 'King'
+      - 'Bishop'
+    right_side:
+      - 'One square in any direction.'
+      - 'Any number of squares diagonally.'
+      - 'Any number of squares vertically or horizontally.'

@@ -23,6 +23,7 @@ library
                         Lulo.HTML.Spec.Combinators
                         Lulo.HTML.Spec.Content
                         Lulo.HTML.Spec.Sidebar
+                        Lulo.Document
                         Lulo.Doc.Parser
                         Lulo.Doc.Types
                         Lulo.Value

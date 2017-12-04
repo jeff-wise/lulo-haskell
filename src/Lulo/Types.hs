@@ -9,7 +9,7 @@
 module Lulo.Types where
 
 
-import Lulo.Schema (DocumentParseError)
+import Lulo.Schema (SchemaParseError)
 
 import Control.Monad.Except (ExceptT, MonadError)
 import Control.Monad.IO.Class (MonadIO)
@@ -26,7 +26,7 @@ import Data.Monoid ((<>))
 --------------------------------------------------------------------------------
 
 newtype CLIError = 
-  CouldNotParseSchema DocumentParseError
+  CouldNotParseSchema SchemaParseError
 
 
 instance Show CLIError where
@@ -44,6 +44,15 @@ newtype CLI a = CLI
 --------------------------------------------------------------------------------
 -- CLI > PARAMETERS
 --------------------------------------------------------------------------------
+
+-- CLI > Parameters > Check
+--------------------------------------------------------------------------------
+
+data CheckParameters = CheckParameters 
+  { checkParamsSchemaFilePath   :: FilePath 
+  , checkParamsDocumentFilePath :: FilePath
+  } deriving (Eq, Show)
+
 
 -- CLI > Parameters > Html
 --------------------------------------------------------------------------------

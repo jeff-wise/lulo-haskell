@@ -27,16 +27,22 @@ import qualified Data.Yaml as Yaml
 
 
 
-parseSchemaFile :: FilePath -> IO (Either DocumentParseError Schema)
+--------------------------------------------------------------------------------
+-- API
+--------------------------------------------------------------------------------
+
+-- | Try to parse a schema file
+parseSchemaFile :: FilePath -> IO (Either SchemaParseError Schema)
 parseSchemaFile schemaFilePath = do
   eYamlValue <- Yaml.decodeFileEither schemaFilePath 
                   :: IO (Either Yaml.ParseException Yaml.Value)
   case eYamlValue of
     Right yamlValue -> return $ parseSchemaDocument yamlValue
-    Left  ex        -> return $ Left $ DocumentYamlError ex
+    Left  ex        -> return $ Left $ SchemaYamlError ex
 
 
-parseSchemaDocument :: Yaml.Value -> Either DocumentParseError Schema
+-- | Try to parse a schema yaml value
+parseSchemaDocument :: Yaml.Value -> Either SchemaParseError Schema
 parseSchemaDocument yamlValue = do
   let schemaSchemaIndex = schemaIndex schemaSchema
       schemaType = fromJust $ lookupSchemaType (CustomTypeName "schema") 
@@ -44,9 +50,9 @@ parseSchemaDocument yamlValue = do
   schemaDoc <- schemaDocParser schemaSchemaIndex schemaType
   case fromDocument schemaDoc of
     Right schema -> return schema 
-    Left  err    -> Left $ DocumentConversionError err
+    Left  err    -> Left $ SchemaConversionError err
   where
-    schemaDocParser :: SchemaIndex -> CustomType -> Either DocumentParseError Doc
+    schemaDocParser :: SchemaIndex -> CustomType -> Either SchemaParseError Doc
     schemaDocParser schemaSchemaIndex schemaType = do
       let docParser = valueParser schemaType 
                                   yamlValue 
@@ -56,20 +62,23 @@ parseSchemaDocument yamlValue = do
                                   []
       case docParser of
         Right doc -> return doc
-        Left  err -> Left $ DocumentFormatError err  
+        Left  err -> Left $ SchemaFormatError err  
 
 
+--------------------------------------------------------------------------------
+-- TYPES
+--------------------------------------------------------------------------------
 
-data DocumentParseError = 
-    DocumentYamlError Yaml.ParseException
-  | DocumentFormatError DocParseError
-  | DocumentConversionError ValueParseError
+data SchemaParseError = 
+    SchemaYamlError Yaml.ParseException
+  | SchemaFormatError DocParseError
+  | SchemaConversionError ValueParseError
 
 
-instance Show DocumentParseError where
-  show (DocumentYamlError yamlException) = 
+instance Show SchemaParseError where
+  show (SchemaYamlError yamlException) = 
       "Yaml Error: " <> show yamlException
-  show (DocumentFormatError docParseError) = show docParseError 
-  show (DocumentConversionError valueParseError) = show valueParseError 
+  show (SchemaFormatError docParseError) = show docParseError 
+  show (SchemaConversionError valueParseError) = show valueParseError 
     
 

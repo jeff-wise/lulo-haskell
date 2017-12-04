@@ -1,0 +1,164 @@
+version: '0.1'
+metadata:
+  name: Quiz
+  authors:
+  - name: 'Author'
+description:
+  overview: |+
+    Quizzes are an assessment of a person's knowledge. Each quiz has
+    a maximum number of points. Each person that completes a quiz is
+    assigned some number of points between 0 and the maximum.
+
+    A quiz may contain any number of questions. Question may presented
+    in the following formats:
+      
+      * Multiple Choice
+      * Open-Ended
+      * Fill in the Blank
+
+root_type: quiz
+types:
+# Quiz
+- type: product_type
+  product_type:
+    name: quiz  
+    label: Quiz
+    description: >
+      A quiz is a collection of questions. Each question has a point
+      value. Each quiz has a score which is the total point value of all the
+      questions a user has answered correctly.
+    group: Quiz
+    fields:
+    - name: name
+      type: 
+        type: prim_type
+        prim_type: string
+      presence: required
+      description: The name of the quiz.
+    - name: description
+      type: 
+        type: prim_type
+        prim_type: string
+      presence: required
+      description: The quiz description.
+    - name: questions
+      type: 
+        type: custom_coll_type
+        custom_coll_type: question
+      presence: required
+      description: The quiz questions.
+# Question
+- type: sum_type
+  sum_type:
+    name: question
+    label: Question
+    description: A quiz question.
+    group: Question
+    group: 'Question'
+    cases:
+    - type: question_multiple_choice 
+      description: A multiple choice question.
+    - type: question_open_ended
+      description: An open-ended question.
+    - type: question_matching
+      description: A matching question.
+# Multiple Choice Question
+- type: product_type
+  product_type:
+    name: question_multiple_choice
+    label: Multiple Choice Question
+    description: >
+      A multiple choice question. The question consists of some text
+      that describes the problem and a number of possible solutions.
+    group: 'Question'
+    fields:
+    - name: points
+      type: 
+        type: prim_type
+        prim_type: number
+      presence: required  
+      description: >
+        The number of points this question is worth when answered
+        correctly.
+    - name: question
+      type:
+        type: prim_type
+        prim_type: string
+      presence: required
+      description: >
+        The question the quiz taker must answer. The question will
+        have multiple answers to choose from.
+    - name: choices
+      type: 
+        type: prim_coll_type
+        prim_coll_type: string
+      presence: required
+      description: >
+        The possible answers to the question.
+# Open-Ended Question
+- type: product_type
+  product_type:
+    name: question_open_ended
+    label: Open-Ended Question
+    description: >
+      An open-ended question. The answer may be any text.
+    group: 'Question'
+    fields:
+    - name: points
+      type: 
+        type: prim_type
+        prim_type: number
+      presence: required  
+      description: >
+        The number of points this question is worth when answered
+        correctly.
+    - name: question
+      type:
+        type: prim_type
+        prim_type: string
+      presence: required
+      description: >
+        The question the quiz taker must answer. The answer may be
+        anything.
+# Matching Question
+- type: product_type
+  product_type:
+    name: question_matching
+    label: Matching Question
+    description: >
+      An open-ended question. The answer may be any text.
+    group: 'Question'
+    fields:
+    - name: points
+      type: 
+        type: prim_type
+        prim_type: number
+      presence: required  
+      description: >
+        The number of points this question is worth when answered
+        correctly.
+    - name: question
+      type:
+        type: prim_type
+        prim_type: string
+      presence: required
+      description: >
+        The question the quiz taker must answer. The answer may be
+        anything.
+    - name: left_side
+      type: 
+        type: prim_coll_type
+        prim_coll_type: string
+      presence: required
+      description: >
+        The list of options on the left side to match to items on the
+        right side.
+    - name: right_side
+      type: 
+        type: prim_coll_type
+        prim_coll_type: string
+      presence: required
+      description: >
+        The list of options on the right side that need to be matched
+        to items on the left side.
+

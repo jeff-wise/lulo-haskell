@@ -28,3 +28,5 @@ schemaDivHtml schema = schemaDiv (schemaIndex schema)
 
 schemaJS :: String
 schemaJS = scriptText
+
+

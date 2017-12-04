@@ -6,10 +6,11 @@
 module Lulo.CLI where
 
 
+import Lulo.Document (parseDocumentFile)
 import Lulo.HTML as LuloHtml
 import Lulo.HTML.Types (HtmlSettings (..), defaultHtmlSettings)
 import Lulo.Types
-import Lulo.Schema
+import Lulo.Schema (parseSchemaFile)
 import Lulo.Schema.SchemaSchema (schemaSchema)
 import Lulo.Schema.Types (Schema)
 import Lulo.Schema.Index (schemaIndex)
@@ -45,7 +46,8 @@ cli = execParser opts >>= run
 --------------------------------------------------------------------------------
 
 data Command =
-    CmdHtml HtmlParameters
+    CmdCheck CheckParameters
+  | CmdHtml HtmlParameters
   | CmdSchemaSchema SchemaSchemaParameters
   deriving (Eq, Show)
 
@@ -56,9 +58,14 @@ data Command =
 -- | Parse the subcommands 
 commandParser :: Parser Command
 commandParser = hsubparser ( 
-     command "html" (info htmlParser htmlInfo)
+     command "check" (info checkParser checkInfo)
+  <> command "html" (info htmlParser htmlInfo)
   <> command "schemaschema" (info ssParser ssInfo) )
   where
+    checkInfo =
+         fullDesc
+      <> progDesc "Validate a document against a schema."
+      <> header   "Validate a document."
     htmlInfo =
          fullDesc
       <> progDesc "Generate HTML documenation for a schema."
@@ -67,6 +74,18 @@ commandParser = hsubparser (
          fullDesc
       <> progDesc "Schema Schema commands."
       <> header    "Schema Schema"
+
+
+-- Commands > Parser > Check
+--------------------------------------------------------------------------------
+
+-- | Parser the parameters from the command line
+checkParser :: Parser Command
+checkParser = CmdCheck <$> params
+  where
+    params = CheckParameters
+      <$> argument str (metavar "DOCUMENT")
+      <*> argument str (metavar "SCHEMA")
 
 
 -- Commands > Parser > Html
@@ -124,8 +143,24 @@ run cmd = do
   where
     runCommand :: CLI ()
     runCommand = case cmd of
+      CmdCheck        params -> checkCommand params
       CmdHtml         params -> generateHtmlCommand params
       CmdSchemaSchema params -> schemaSchemaCommand params
+
+
+-- Run > Check
+--------------------------------------------------------------------------------
+
+checkCommand :: CheckParameters -> CLI ()
+checkCommand params = liftIO $ do
+  eSchema <- parseSchemaFile $ checkParamsSchemaFilePath params
+  case eSchema of
+    Left err -> putStrLn $ "Could not parse schema:\n\n" <> show err
+    Right schema -> do
+      eDoc <- parseDocumentFile (checkParamsDocumentFilePath params) schema
+      case eDoc of
+        Left err -> putStrLn $ "Could not parse document:\n\n" <> show err
+        Right _  -> putStrLn "Document is member of schema."
 
 
 -- Run > Generate Html

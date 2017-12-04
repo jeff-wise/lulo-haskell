@@ -64,7 +64,7 @@ data SchemaIndex = SchemaIndex
   { schemaIndexVersion           :: SchemaVersion
   , schemaIndexMetadata          :: SchemaMetadata
   , schemaIndexDescription       :: Maybe SchemaDescription    
-  , schemaIndexRootTypeName      :: Maybe CustomTypeName    
+  , schemaIndexRootTypeName      :: CustomTypeName    
   , schemaIndexTypeByName        :: Map CustomTypeName CustomType
   , schemaIndexConstraintByName  :: Map ConstraintName Constraint
   , schemaIndexTypesByGroup      :: Map CustomTypeGroup (HashSet CustomType)

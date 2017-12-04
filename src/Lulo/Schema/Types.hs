@@ -34,7 +34,7 @@ data Schema = Schema
   { schemaVersion      :: SchemaVersion
   , schemaMetadata     :: SchemaMetadata
   , schemaDescription  :: Maybe SchemaDescription    
-  , schemaRootTypeName :: Maybe CustomTypeName    
+  , schemaRootTypeName :: CustomTypeName    
   , schemaTypes        :: [CustomType]
   , schemaConstraints  :: [Constraint]
   }
@@ -45,10 +45,10 @@ instance FromDocument Schema where
                           <$> (atParser "version" doc >>= fromDocument)
                           <*> (atParser "metadata" doc >>= fromDocument)
                           <*> (maybeAtParser "description" doc >>= fromMaybeDocument)
-                          <*> (maybeAtParser "root_type" doc >>= fromMaybeDocument)
+                          <*> (atParser "root_type" doc >>= fromDocument)
                           <*> (atListParser "types" doc >>= 
                             (\(ListDoc docs _ _) -> mapM customTypeFromDocument $ zip [0..] docs))
-                          <*> (atListParser "constraints" doc >>= 
+                          <*> (atMaybeListParser "constraints" doc >>= 
                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
@@ -81,7 +81,7 @@ instance FromDocument SchemaMetadata where
   fromDocument (DocDict doc) = SchemaMetadata 
                            <$> (atParser "name" doc >>= fromDocument)
                            <*> (atListParser "authors" doc >>= 
-                                 (\(ListDoc docs _ _) -> mapM fromDocument docs))
+                                  mapM fromDocument . listDocDocs)
   fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
     UnexpectedTypeError DocDictType (docType doc) (docPath doc)
 

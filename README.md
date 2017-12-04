@@ -26,7 +26,7 @@ Then you can:
   1. Validate that a JSON / YAML document matches a schema.
   2. Automatically parse a JSON / YAML document that matches a schema.
      Parsing is flexible -- you can map the parsed data to any data structure.
- 3. Generate HTML documentation for a schema.
+  3. Generate HTML documentation for a schema.
 
 With Lulo you can declare your data types in schema files and use the
 same data in different parts of your application. The data will always
@@ -54,9 +54,14 @@ generated HTML documentation as a guide.
 
 ### Contents
 
+- [Installation](#installation)
+  - [Library](#library)
+  - [Executable](#executable)
 - [Getting Started](#getting-started)
-  - [Define a Schema](#define-a-schema)
-  - [Parse Documents](#parse-documents)
+  - [Defining a Schema](#defining-a-schema)
+  - [Creating Documents](#creating-documents)
+  - [Parsing Documents](#parsing-documents)
+  - [Encoding Documents](#encoding-documents)
   - [Generate HTML Documentation](#generate-html-documentation)
 - [Schemas](#schemas)
   - [Types](#types)
@@ -64,6 +69,16 @@ generated HTML documentation as a guide.
     - [Products](#products)
     - [Sums](#sums)
   - [Constraints](#constraints)
+
+## Installation
+
+### Library
+
+TODO
+
+### Executable
+
+TODO
 
 ## Getting Started
 
@@ -92,7 +107,7 @@ parsing an API request body, or sending data to another component:
 Additionally, if the data format is changed, each component only 
 needs the updated schema. No code modification is necessary. 
 
-### 1. Define a Schema
+### 1. Defining a Schema
 
 Let's define our quiz data. The schema defines the structure and
 possible values of our data. It also contains a lot of metadata. The
@@ -130,6 +145,7 @@ description:
 
 root_type: quiz
 types:
+# Quiz
 - type: product_type
   product_type:
     name: quiz  
@@ -158,12 +174,14 @@ types:
         custom_coll_type: question
       presence: required
       description: The quiz questions.
+# Question
 - type: sum_type
   sum_type:
     name: question
     label: Question
     description: A quiz question.
     group: Question
+    group: 'Question'
     cases:
     - type: question_multiple_choice 
       description: A multiple choice question.
@@ -171,6 +189,7 @@ types:
       description: An open-ended question.
     - type: question_matching
       description: A matching question.
+# Multiple Choice Question
 - type: product_type
   product_type:
     name: question_multiple_choice
@@ -178,7 +197,7 @@ types:
     description: >
       A multiple choice question. The question consists of some text
       that describes the problem and a number of possible solutions.
-    group: 'Question: Multiple Choice'
+    group: 'Question'
     fields:
     - name: points
       type: 
@@ -203,13 +222,14 @@ types:
       presence: required
       description: >
         The possible answers to the question.
+# Open-Ended Question
 - type: product_type
   product_type:
     name: question_open_ended
     label: Open-Ended Question
     description: >
       An open-ended question. The answer may be any text.
-    group: 'Question: Multiple Choice'
+    group: 'Question'
     fields:
     - name: points
       type: 
@@ -227,13 +247,14 @@ types:
       description: >
         The question the quiz taker must answer. The answer may be
         anything.
+# Matching Question
 - type: product_type
   product_type:
     name: question_matching
     label: Matching Question
     description: >
       An open-ended question. The answer may be any text.
-    group: 'Question: Multiple Choice'
+    group: 'Question'
     fields:
     - name: points
       type: 
@@ -266,24 +287,237 @@ types:
       presence: required
       description: >
         The list of options on the right side that need to be matched
-        to items on the right side.
+        to items on the left side.
 ```
 
-### 2. Parse Documents 
+### 2. Creating Documents
 
-### 3. Generate HTML Documentation
+We defined a schema for our quiz data type as well as its constituent
+types. Now we can create some values that match those types. We'll 
+create an example quiz that fits the specification above.
+
+```yaml
+name: Chess Quiz
+description: A quiz about chess.
+questions:
+- type: question_multiple_choice
+  question_multiple_choice:
+    points: 1
+    question: How many squares are on a chess board?
+    choices:
+    - '36'
+    - '50'
+    - '64'
+    - '100'
+- type: question_open_ended
+  question_open_ended:
+    points: 2
+    question: 'What is your favorite chess opening and why?'
+- type: question_matching
+  question_matching:
+    points: 2
+    question: 'Match the piece to its movement pattern.'
+    left_side: 
+      - 'Rook'
+      - 'King'
+      - 'Bishop'
+    right_side:
+      - 'One square in any direction.'
+      - 'Any number of squares diagonally.'
+      - 'Any number of squares vertically or horizontally.'
+```
+
+We can use the `check` command from the Lulo executable to validate
+that our quiz matches the schema.
+
+```bash
+stack exec lulo-exe -- check examples/quiz/schema.yaml examples/quiz/chess_quiz.yaml
+```
+
+It should print:
+
+```bash
+> Document is member of schema.
+```
+
+### 3. Parsing Documents
+
+Suppose we want to write a program that can read quiz files like the
+one we just defined and display them. We can use Lulo and the schema
+defined in [step 1](#defining-a-schema) to automatically validate and
+parse the quiz yaml files.
+
+Lulo parses the yaml files into an intermediary representation. You
+will have to write functions to map the intermediary value to your own
+data types. The advantage of this method is that your data types are
+not dependent on the yaml representation, or vice versa. In the future
+there may be support for more automatic deserialization.
+
+First, let's define the Haskell data types. For each data type, we'll
+write an instance of the `FromDocument` typeclass which will take
+a `Doc` and map it to our Haskell value. 
+
+```haskell
+
+data Quiz = Quiz
+  { quizName        :: Text
+  , quizDescription :: Text
+  , questions       :: [Question]
+  }
+
+instance FromDocument Quiz where
+  fromDocument (DocDict doc) = Quiz 
+    <$> (atParser "name" doc >>= fromDocument)
+    <*> (atParser "description" doc >>= fromDocument)
+    <*> (atListParser "questions" doc >>= mapM fromDocument . listDocDocs)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+data Question = 
+    QuestionMultipleChoice MultipleChoiceQuestion
+  | QuestionOpenEnded OpenEndedQuestion
+  | QuestionMatching MatchingQuestion
+
+instance FromDocument Question where
+  fromDocument doc = 
+    case docCase doc of
+      "question_multiple_choice" -> QuestionMultipleChoice <$> fromDocument doc
+      "question_open_ended"      -> QuestionOpenEnded <$> fromDocument doc
+      "question_matching"        -> QuestionMatching <$> fromDocument doc
+      _                          -> Left $ ValueParseErrorUnknownCase $ 
+        UnknownCaseError (docCase doc) "CustomType" (docPath doc)
+
+
+data MultipleChoiceQuestion = MultipleChoiceQuestion
+  { multipleChoiceQuestionPoints   :: Int
+  , multipleChoiceQuestionQuestion :: Text
+  , multipleChoiceQuestionChoices  :: [Text]
+  }
+
+instance FromDocument MultipleChoiceQuestion where
+  fromDocument (DocDict doc) = MultipleChoiceQuestion
+    <$> (atParser "points" doc >>= fromDocument)
+    <*> (atParser "question" doc >>= fromDocument)
+    <*> atTextListParser "choices" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+data OpenEndedQuestion = OpenEndedQuestion
+  { openEndedQuestionPoints   :: Int
+  , openEndedQuestionQuestion :: Text
+  }
+
+instance FromDocument OpenEndedQuestion where
+  fromDocument (DocDict doc) = OpenEndedQuestion
+    <$> (atParser "points" doc >>= fromDocument)
+    <*> (atParser "question" doc >>= fromDocument)
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+
+data MatchingQuestion = MatchingQuestion
+  { matchingQuestionPoints    :: Int
+  , matchingQuestionQuestion  :: Text
+  , matchingQuestionLeftSide  :: [Text]
+  , matchingQuestionRightSide :: [Text]
+  }
+
+instance FromDocument MatchingQuestion where
+  fromDocument (DocDict doc) = MatchingQuestion
+    <$> (atParser "points" doc >>= fromDocument)
+    <*> (atParser "question" doc >>= fromDocument)
+    <*> atTextListParser "left_side" doc
+    <*> atTextListParser "right_side" doc
+  fromDocument doc           = Left $ ValueParseErrorUnexpectedType $ 
+    UnexpectedTypeError DocDictType (docType doc) (docPath doc)
+
+```
+
+Now, we can use Lulo to parse quizzes. First, we'll parse the schema
+file and keep it in scope so we don't have to parse it again. Then we
+use the schema to parse the document:
+
+```haskell
+
+quizSchemaFilePath :: FilePath
+quizSchemaFilePath = "/quiz_app/schemas/quiz.yaml"
+
+quizDocumentFilePath :: FilePath
+quizDocumentFilePath = "/quiz_app/quizzes/chess_quiz.yaml"
+
+main :: IO ()
+main = do
+  eSchema <- parseSchemaFile quizSchemaFilePath
+  case eSchema of
+    Left err -> putStrLn $ "Could not parse quiz schema:\n\n" <> show err
+    Right schema -> do
+      eQuiz <- parseDocumentFileValue quizDocumentFilePath schema
+      case eQuiz of
+        Left  err  -> putStrLn $ "Could not parse quiz:\n\n" <> show err
+        Right quiz -> doSomething quiz 
+
+```
+
+### 4. Encoding Documents
+
+Coming Soon!
+
+### 5. Generating HTML Documentation
+
+Now, that our application can import and export quizzes, we'd like to
+allow our users to create their own quiz files. We'd also like to
+create a community for our quiz app by supporting third-party
+developers. Perhaps some developers would like to create some
+utilities to manage or create quizzes that are compatible with our
+application.
+
+In order to faciliate external use of the quiz files, we need
+comprehensive and clear documentation. Fortunately, all of the
+information is already in the schema file. Unfortunately, it's not
+easy to read a schema file, since it's fairly verbose and only one
+step removed from plaintext. 
+
+We will use Lulo's HTML generation capability to create nice
+documentation for our quiz app. We can do so with the `html` command
+in the Lulo executable. If we run `--help` on the `html` command, the
+executable with display the options. Note: the command takes in an html
+options file that will control the output of the generated HTML. This
+file provides a lot of flexibility, should you need it, and is
+intended to avoid the scenario that you need to write your own HTML
+generation code.
+
+
+The quiz example in the examples directory contains an html options
+file along with a default stylesheet. To create the documentation, run
+the following command:
+
+```bash
+stack exec -- lulo-exe html -f examples/quiz/dist/index.html --html-options examples/quiz/html-options.yaml
+```
 
 ## Schemas
 
 ### Types
 
+TODO
+
 #### Primitives
+
+TODO
 
 #### Products
 
+TODO
+
 #### Sums
 
+TODO
+
 ### Constraints
+
+TODO
 
 
 [lulo-html-documentation]: https://jeff-wise.github.io/lulo-haskell/schemaschema/
