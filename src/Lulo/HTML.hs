@@ -71,8 +71,10 @@ schemaDiv schemaIndex _ =
 scriptText :: String
 scriptText = 
      "document.addEventListener('DOMContentLoaded', function(event) { "
-  <> "    if (hljs != null) { hljs.initHighlightingOnLoad() };"
+  <> "    console.log('this works');"
+--  <> "    if (hljs != null) { hljs.initHighlightingOnLoad() };"
   <> "    document.querySelector('.section-header.types').addEventListener('click', function(e) {"
+  <> "         console.log('types header clicked');"
   <> "         var indexTypesElement = document.querySelector('#index-types');   " 
   <> "         if (indexTypesElement.classList.contains('open')) {" 
   <> "             indexTypesElement.classList.remove('open');" 
