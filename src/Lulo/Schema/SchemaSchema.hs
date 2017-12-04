@@ -13,6 +13,9 @@ module Lulo.Schema.SchemaSchema where
 import Lulo.Schema.Types
 
 
+import Data.Monoid ((<>))
+import Data.Text (Text)
+
 
 --------------------------------------------------------------------------------
 -- SCHEMA
@@ -21,12 +24,43 @@ import Lulo.Schema.Types
 schemaSchema :: Schema
 schemaSchema = Schema 
   { schemaVersion      = SchemaVersion "1.0"
-  , schemaMetadata     = SchemaMetadata (SchemaName "schema-schema") []
-  , schemaDescription  = Nothing
+  , schemaMetadata     = SchemaMetadata (SchemaName "Schema") []
+  , schemaDescription  = Just $ SchemaDescription schemaDescriptionText
   , schemaRootTypeName = CustomTypeName "schema"
   , schemaTypes        = types
   , schemaConstraints  = constraints
   }
+
+
+schemaDescriptionText :: Text
+schemaDescriptionText = 
+     "Lulo is a data specification format. It allows you define schemas. With " 
+  <> "schemas, you can define the structure of your data with a collection of "
+  <> "Algebraic Data Types. Additionally, schemas may contain constraints, " 
+  <> "sometimes called Refinement Types, on those types in order to precisely "
+  <> "enforce the possible values of the data.\n\n"
+  <> "Then you can:\n\n"
+  <> " * Validate that a JSON / YAML document matches a schema.\n"
+  <> " * Automatically parse a JSON / YAML document that matches a schema." 
+  <> "Parsing is flexible -- you can map the parsed data to any data structure.\n"
+  <> " * Generate HTML documentation for a schema.\n\n"
+  <> "With Lulo you can declare your data types in schema files and use the same "
+  <> "data in different parts of your application. The data will always be the "
+  <> "same because the parsing is done automatically according to the types "
+  <> "defined in the schemas.\n\n"
+  <> "If your application provides an open data format for interfacing with an "
+  <> "API or creating custom scripts, then clients will be able to create their "
+  <> "own programs and use your data by just using Lulo and the data schemas. "
+  <> "Plus, clients can use the generated HTML documentation as a guide.\n\n"
+  <> "> Lulo is Defined With Lulo\n>\n"
+  <> "> Lulo can be defined using Lulo, and in fact, it is. Schemas are just "
+  <> "documents, and Lulo parses them the same way that it parse any other "
+  <> "document. This implies the existence of a schema schema which defines "
+  <> "the format of all schemas.\n>\n"
+  <> "> The schema schema is hard-coded into the implementation because the "
+  <> "schema schema is a schema, and we cannot parse a schema without the schema schema.\n\n"
+  <> "Since Lulo itself is a schema, it's HTML documentation can be automatically "
+  <> "generated -- it is self-documenting."
 
 
 --------------------------------------------------------------------------------
@@ -39,7 +73,7 @@ types = [
     { prodTypeName        = CustomTypeName "schema"
     , prodTypeLabel       = CustomTypeLabel "The schema."
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Schema"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "version"
@@ -95,29 +129,29 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName         = CustomTypeName "schema_version"
-    , primTypeLabel        = CustomTypeLabel "The schema version."
+    , primTypeLabel        = CustomTypeLabel "Version"
     , primTypeDescription  = Nothing
-    , primTypeGroup        = Nothing
+    , primTypeGroup        = Just $ CustomTypeGroup "Schema"
     , primTypeBaseType     = BaseTypePrim String
     , primTypeConstraints  = []
     , primTypeCodeExamples = []
     , primTypeOrder        = 5
     }
   , CustomTypePrim PrimCustomType
-    { primTypeName        = CustomTypeName "schema_name"
-    , primTypeLabel       = CustomTypeLabel "The schema name."
-    , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
-    , primTypeBaseType    = BaseTypePrim String
-    , primTypeConstraints = []
+    { primTypeName         = CustomTypeName "schema_name"
+    , primTypeLabel        = CustomTypeLabel "Name"
+    , primTypeDescription  = Nothing
+    , primTypeGroup        = Just $ CustomTypeGroup "Metadata"
+    , primTypeBaseType     = BaseTypePrim String
+    , primTypeConstraints  = []
     , primTypeCodeExamples = []
-    , primTypeOrder       = 10
+    , primTypeOrder        = 10
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_author"
-    , prodTypeLabel       = CustomTypeLabel "The schema author."
+    , prodTypeLabel       = CustomTypeLabel "Author"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Metadata"
     , prodTypeFields      = [ 
       Field
       { fieldName         = FieldName "name"
@@ -133,9 +167,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_metadata"
-    , prodTypeLabel       = CustomTypeLabel "The schema metadata."
+    , prodTypeLabel       = CustomTypeLabel "Metadata"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Metadata"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -159,9 +193,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "schema_description"
-    , prodTypeLabel       = CustomTypeLabel "The schema description."
+    , prodTypeLabel       = CustomTypeLabel "Description"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Schema"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "overview"
@@ -177,9 +211,9 @@ types = [
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "schema_type"
-    , sumTypeLabel       = CustomTypeLabel "A schema type."
+    , sumTypeLabel       = CustomTypeLabel "Type"
     , sumTypeDescription = Nothing
-    , sumTypeGroup       = Nothing
+    , sumTypeGroup       = Just $ CustomTypeGroup "Type"
     , sumTypeCases       = [ 
         Case
         { caseType        = CustomTypeName "product_type"
@@ -203,9 +237,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "product_type"
-    , prodTypeLabel       = CustomTypeLabel "A product type."
+    , prodTypeLabel       = CustomTypeLabel "Product Type"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Type"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -269,9 +303,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "sum_type"
-    , prodTypeLabel       = CustomTypeLabel "A sum type."
+    , prodTypeLabel       = CustomTypeLabel "Sum Type"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Type"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -335,9 +369,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "primitive_type"
-    , prodTypeLabel       = CustomTypeLabel "A wrapper type."
+    , prodTypeLabel       = CustomTypeLabel "Wrapper Type"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Type"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -401,9 +435,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "symbol_type"
-    , prodTypeLabel       = CustomTypeLabel "A symbol type."
+    , prodTypeLabel       = CustomTypeLabel "Symbol Type"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Type"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -467,9 +501,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_name"
-    , primTypeLabel       = CustomTypeLabel "A type name."
+    , primTypeLabel       = CustomTypeLabel "Type Name"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Type"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -477,9 +511,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_label"
-    , primTypeLabel       = CustomTypeLabel "A type label."
+    , primTypeLabel       = CustomTypeLabel "Type Label"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Type"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -487,9 +521,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_description"
-    , primTypeLabel       = CustomTypeLabel "A type description."
+    , primTypeLabel       = CustomTypeLabel "Type Description"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Type"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -497,9 +531,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "type_group"
-    , primTypeLabel       = CustomTypeLabel "A type group."
+    , primTypeLabel       = CustomTypeLabel "Type Group"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Type"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -507,9 +541,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "code_example"
-    , prodTypeLabel       = CustomTypeLabel "A code example."
+    , prodTypeLabel       = CustomTypeLabel "Code Example"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "language"
@@ -558,9 +592,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_language"
-    , primTypeLabel       = CustomTypeLabel "The code language."
+    , primTypeLabel       = CustomTypeLabel "Code Example Language"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -568,9 +602,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_case"
-    , primTypeLabel       = CustomTypeLabel "The purpose of the code."
+    , primTypeLabel       = CustomTypeLabel "Code Example Case"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -578,9 +612,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_code"
-    , primTypeLabel       = CustomTypeLabel "The code."
+    , primTypeLabel       = CustomTypeLabel "Code Example Code"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -588,9 +622,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_title"
-    , primTypeLabel       = CustomTypeLabel "Title of the example."
+    , primTypeLabel       = CustomTypeLabel "Code Example Title"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -598,9 +632,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "code_example_description"
-    , primTypeLabel       = CustomTypeLabel "Description of the code."
+    , primTypeLabel       = CustomTypeLabel "Code Example Description"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Code Example"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -608,9 +642,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "field"
-    , prodTypeLabel       = CustomTypeLabel "A field."
+    , prodTypeLabel       = CustomTypeLabel "Field"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Field"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -658,9 +692,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_name"
-    , primTypeLabel       = CustomTypeLabel "A field name."
+    , primTypeLabel       = CustomTypeLabel "Field Name"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Field"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -668,9 +702,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_presence"
-    , primTypeLabel       = CustomTypeLabel "optional / required."
+    , primTypeLabel       = CustomTypeLabel "Field Presence"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Field"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -678,9 +712,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_description"
-    , primTypeLabel       = CustomTypeLabel "A field description."
+    , primTypeLabel       = CustomTypeLabel "Field Description"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Field"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -688,9 +722,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "field_default_value"
-    , primTypeLabel       = CustomTypeLabel "A field default value."
+    , primTypeLabel       = CustomTypeLabel "Field Default Value"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Field"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -698,9 +732,21 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "case"
-    , prodTypeLabel       = CustomTypeLabel "A case."
-    , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeLabel       = CustomTypeLabel "Case"
+    , prodTypeDescription = Just $ CustomTypeDescription $ 
+           "A case of a sum type. \n\n"
+        <> "A sum type is a tagged union of types. Each type in the tagged union is a case.\n\n"
+        <> "For example, suppose we have a Pet datatype represented with Haskell syntax:\n"
+        <> "```\n"
+        <> "data Pet = \n"
+        <> "    PetDog Dog\n"
+        <> "  | PetCat Cat\n"
+        <> "  | PetHamster Hamster\n"
+        <> "```\n\n"
+        <> "Each data constructor of `Pet` (e.g. `PetDog`, `PetCat`, ...) is a case. The only difference is that Lulo doesn't have tags. "
+        <> "Each case is uniquely identified by the type (e.g. `Dog`, `Cat`, ...), so every case in a sum type must "
+        <> "represent a unique type."
+    , prodTypeGroup       = Just $ CustomTypeGroup "Case"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "type"
@@ -719,14 +765,36 @@ types = [
         , fieldDefaultValue = Nothing
         }
       ] 
-    , prodTypeCodeExamples = []
+    , prodTypeCodeExamples = [
+        CodeExample
+        { codeExampleLanguage    = "YAML"
+        , codeExampleCase        = Nothing 
+        , codeExampleCode        = 
+               "type: sum_type\n"
+            <> "sum_type:\n"
+            <> "   name: question\n"
+            <> "   label: Question\n"
+            <> "   description: The types of questions on a quiz.\n"
+            <> "   cases:\n"
+            <> "   - type: multiple_choice\n"
+            <> "     description: A question with a set of possible answers.\n"
+            <> "   - type: open_ended\n"
+            <> "     description: A question with a written answer.\n"
+            <> "   - type: matching\n"
+            <> "     description: > \n"
+            <> "       A question where the user must match items on the left side \n"
+            <> "       to items on the left side to the right side."
+        , codeExampleTitle        = "A Question" 
+        , codeExampleDescription  = Just "A sum type that represents a question with three cases."
+        }
+      ]
     , prodTypeOrder         = 95
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "case_description"
-    , primTypeLabel       = CustomTypeLabel "A case description."
+    , primTypeLabel       = CustomTypeLabel "Case Description"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Case"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -734,9 +802,9 @@ types = [
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "base_type"
-    , sumTypeLabel       = CustomTypeLabel "The type of a value."
+    , sumTypeLabel       = CustomTypeLabel "Wrappable Type"
     , sumTypeDescription = Nothing
-    , sumTypeGroup       = Nothing
+    , sumTypeGroup       = Just $ CustomTypeGroup "Wrappable Type"
     , sumTypeCases       = [ 
         Case
         { caseType        = CustomTypeName "prim_type"
@@ -752,9 +820,9 @@ types = [
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "value_type"
-    , sumTypeLabel       = CustomTypeLabel "The type of a value."
+    , sumTypeLabel       = CustomTypeLabel "Kind"
     , sumTypeDescription = Nothing
-    , sumTypeGroup       = Nothing
+    , sumTypeGroup       = Just $ CustomTypeGroup "Kind"
     , sumTypeCases       = [ 
         Case
         { caseType        = CustomTypeName "prim_type"
@@ -778,9 +846,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_type"
-    , primTypeLabel       = CustomTypeLabel "A primitive type."
+    , primTypeLabel       = CustomTypeLabel "Primitive Type"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Kind"
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -788,9 +856,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_coll_type"
-    , primTypeLabel       = CustomTypeLabel "A primitive collection type."
+    , primTypeLabel       = CustomTypeLabel "Primitive Collection Type"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Kind"
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "prim_value_type"
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -798,9 +866,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "custom_type"
-    , primTypeLabel       = CustomTypeLabel "A custom type."
+    , primTypeLabel       = CustomTypeLabel "Custom Type"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Kind"
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -808,9 +876,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "custom_coll_type"
-    , primTypeLabel       = CustomTypeLabel "A custom collection type."
+    , primTypeLabel       = CustomTypeLabel "Custom Collection Type"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Kind"
     , primTypeBaseType    = BaseTypeCustom $ CustomTypeName "type_name"
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -818,9 +886,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "prim_value_type"
-    , primTypeLabel       = CustomTypeLabel "A primitive value type."
+    , primTypeLabel       = CustomTypeLabel "Primivite Value Type"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Kind"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -828,9 +896,9 @@ types = [
     }
   , CustomTypeSum SumCustomType 
     { sumTypeName        = CustomTypeName "constraint"
-    , sumTypeLabel       = CustomTypeLabel "A constraint."
+    , sumTypeLabel       = CustomTypeLabel "Constraint"
     , sumTypeDescription = Nothing
-    , sumTypeGroup       = Nothing
+    , sumTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , sumTypeCases       = [ 
         Case
         { caseType        = CustomTypeName "constraint_string_one_of"
@@ -846,9 +914,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "constraint_name"
-    , primTypeLabel       = CustomTypeLabel "A constraint name."
+    , primTypeLabel       = CustomTypeLabel "Constraint Name"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -856,9 +924,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "constraint_label"
-    , primTypeLabel       = CustomTypeLabel "A constraint label."
+    , primTypeLabel       = CustomTypeLabel "Constraint Label"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -866,9 +934,9 @@ types = [
     }
   , CustomTypePrim PrimCustomType
     { primTypeName        = CustomTypeName "constraint_description"
-    , primTypeLabel       = CustomTypeLabel "A constraint description."
+    , primTypeLabel       = CustomTypeLabel "Constraint Description"
     , primTypeDescription = Nothing
-    , primTypeGroup       = Nothing
+    , primTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , primTypeBaseType    = BaseTypePrim String
     , primTypeConstraints = []
     , primTypeCodeExamples = []
@@ -876,9 +944,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "constraint_string_one_of"
-    , prodTypeLabel       = CustomTypeLabel "String one of constraint."
+    , prodTypeLabel       = CustomTypeLabel "String Membership Constraint"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"
@@ -918,9 +986,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "constraint_string_one_of_value"
-    , prodTypeLabel       = CustomTypeLabel "String one of constraint value."
+    , prodTypeLabel       = CustomTypeLabel "String Membership Constraint Value."
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "value"
@@ -944,9 +1012,9 @@ types = [
     }
   , CustomTypeProduct ProductCustomType 
     { prodTypeName        = CustomTypeName "constraint_num_greater_than"
-    , prodTypeLabel       = CustomTypeLabel "Number greater than constraint."
+    , prodTypeLabel       = CustomTypeLabel "Number Greater Than Constraint"
     , prodTypeDescription = Nothing
-    , prodTypeGroup       = Nothing
+    , prodTypeGroup       = Just $ CustomTypeGroup "Constraint"
     , prodTypeFields      = [ 
         Field
         { fieldName         = FieldName "name"

@@ -23,10 +23,10 @@ order to precisely enforce the possible values of the data.
 
 Then you can:
 
-  1. Validate that a JSON / YAML document matches a schema.
-  2. Automatically parse a JSON / YAML document that matches a schema.
-     Parsing is flexible -- you can map the parsed data to any data structure.
-  3. Generate HTML documentation for a schema.
+  * Validate that a JSON / YAML document matches a schema.
+  * Automatically parse a JSON / YAML document that matches a schema.
+    Parsing is flexible -- you can map the parsed data to any data structure.
+  * Generate HTML documentation for a schema.
 
 With Lulo you can declare your data types in schema files and use the
 same data in different parts of your application. The data will always
@@ -180,7 +180,6 @@ types:
     name: question
     label: Question
     description: A quiz question.
-    group: Question
     group: 'Question'
     cases:
     - type: question_multiple_choice 
@@ -292,9 +291,13 @@ types:
 
 ### 2. Creating Documents
 
-We defined a schema for our quiz data type as well as its constituent
-types. Now we can create some values that match those types. We'll 
-create an example quiz that fits the specification above.
+We just defined a schema to represent our quiz and its components. The
+schema is equivalent to a type in a programming language -- it defines
+the set of possible values that may exist. In this case, our quiz
+schema defines the set of valid quizzes. We'll say our quiz matches
+the schema if our quiz has the same structure and values defined by
+the schema. Let's create a quiz about chess that matches our quiz
+schema.
 
 ```yaml
 name: Chess Quiz

@@ -52,7 +52,7 @@ html specIndex =
 
 versionHTML :: SchemaVersion -> Html
 versionHTML _version =
-  H.div ! A.id "version" $ do
+  H.div ! A.id "schema-version" $ do
     H.span ! A.class_ "version-label" $ "version"
     H.span ! A.class_ "version" $ toHtml $ getSchemaVersion _version
     H.span ! A.class_ "caret" $ preEscapedToHtml ("&#9660;" :: Text)
