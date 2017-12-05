@@ -1,0 +1,2776 @@
+<!DOCTYPE HTML>
+
+<html>
+    <head>
+        <title>
+            Schema
+        </title>
+        <link rel="stylesheet" type="text/css" href="css/schema.css">
+        <link rel="stylesheet" type="text/css" href="css/highlight.css">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato:400,700">
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Source+Code+Pro">
+    </head>
+    <body>
+        <div id="schema">
+            <div id="sidebar">
+                <div id="index">
+                    <div id="schema-version">
+                        <span class="version-label">
+                            version
+                        </span>
+                        <span class="version">
+                            1.0
+                        </span>
+                        <span class="caret">
+                            &#9660;
+                        </span>
+                    </div>
+                    <div class="section">
+                        <div class="section-header introduction">
+                            <div class="caret">
+                                &#x25B6
+                            </div>
+                            <h2>
+                                Introduction
+                            </h2>
+                        </div>
+                        <div id="introduction-sections" class="closed">
+                            <div class="subsection-header">
+                                <a href="#introduction-overview">
+                                    <h3>
+                                        Overview
+                                    </h3>
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-header types">
+                            <div class="caret">
+                                &#x25B6
+                            </div>
+                            <h2>
+                                Types
+                            </h2>
+                        </div>
+                        <div id="index-types" class="closed">
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#case">
+                                        <h3>
+                                            Case
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Case">
+                                    <li>
+                                        <a class="object" href="#case">
+                                            <h5>
+                                                Case
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#case_description">
+                                            <h5>
+                                                Case Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#code-example">
+                                        <h3>
+                                            Code Example
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Code Example">
+                                    <li>
+                                        <a class="object" href="#code_example">
+                                            <h5>
+                                                Code Example
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#code_example_case">
+                                            <h5>
+                                                Code Example Case
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#code_example_code">
+                                            <h5>
+                                                Code Example Code
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#code_example_description">
+                                            <h5>
+                                                Code Example Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#code_example_language">
+                                            <h5>
+                                                Code Example Language
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#code_example_title">
+                                            <h5>
+                                                Code Example Title
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#constraint">
+                                        <h3>
+                                            Constraint
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Constraint">
+                                    <li>
+                                        <a class="object" href="#constraint">
+                                            <h5>
+                                                Constraint
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_description">
+                                            <h5>
+                                                Constraint Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_label">
+                                            <h5>
+                                                Constraint Label
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_name">
+                                            <h5>
+                                                Constraint Name
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_num_greater_than">
+                                            <h5>
+                                                Number Greater Than Constraint
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_string_one_of">
+                                            <h5>
+                                                String Membership Constraint
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#constraint_string_one_of_value">
+                                            <h5>
+                                                String Membership Constraint Value.
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#field">
+                                        <h3>
+                                            Field
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Field">
+                                    <li>
+                                        <a class="object" href="#field">
+                                            <h5>
+                                                Field
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#field_default_value">
+                                            <h5>
+                                                Field Default Value
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#field_description">
+                                            <h5>
+                                                Field Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#field_name">
+                                            <h5>
+                                                Field Name
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#field_presence">
+                                            <h5>
+                                                Field Presence
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#kind">
+                                        <h3>
+                                            Kind
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Kind">
+                                    <li>
+                                        <a class="object" href="#custom_coll_type">
+                                            <h5>
+                                                Custom Collection Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#custom_type">
+                                            <h5>
+                                                Custom Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#prim_coll_type">
+                                            <h5>
+                                                Primitive Collection Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#prim_type">
+                                            <h5>
+                                                Primitive Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#prim_value_type">
+                                            <h5>
+                                                Primivite Value Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#value_type">
+                                            <h5>
+                                                Kind
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#metadata">
+                                        <h3>
+                                            Metadata
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Metadata">
+                                    <li>
+                                        <a class="object" href="#schema_author">
+                                            <h5>
+                                                Author
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#schema_metadata">
+                                            <h5>
+                                                Metadata
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#schema_name">
+                                            <h5>
+                                                Name
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#schema">
+                                        <h3>
+                                            Schema
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Schema">
+                                    <li>
+                                        <a class="object" href="#schema">
+                                            <h5>
+                                                The schema.
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#schema_description">
+                                            <h5>
+                                                Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#schema_version">
+                                            <h5>
+                                                Version
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#type">
+                                        <h3>
+                                            Type
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Type">
+                                    <li>
+                                        <a class="object" href="#primitive_type">
+                                            <h5>
+                                                Wrapper Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#product_type">
+                                            <h5>
+                                                Product Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#schema_type">
+                                            <h5>
+                                                Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#sum_type">
+                                            <h5>
+                                                Sum Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#symbol_type">
+                                            <h5>
+                                                Symbol Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#type_description">
+                                            <h5>
+                                                Type Description
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#type_group">
+                                            <h5>
+                                                Type Group
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#type_label">
+                                            <h5>
+                                                Type Label
+                                            </h5>
+                                        </a>
+                                    </li>
+                                    <li>
+                                        <a class="object" href="#type_name">
+                                            <h5>
+                                                Type Name
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                            <div class="group">
+                                <div class="subsection-header">
+                                    <a href="#wrappable-type">
+                                        <h3>
+                                            Wrappable Type
+                                        </h3>
+                                    </a>
+                                </div>
+                                <ul class="Wrappable Type">
+                                    <li>
+                                        <a class="object" href="#base_type">
+                                            <h5>
+                                                Wrappable Type
+                                            </h5>
+                                        </a>
+                                    </li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section">
+                        <div class="section-header constraints">
+                            <div class="caret">
+                                &#x25B6
+                            </div>
+                            <h2>
+                                Constraints
+                            </h2>
+                        </div>
+                        <div id="index-constraints" class="closed">
+                            <ul>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div id="content">
+                <header class="languages">
+                    <div class="definition">
+                    </div>
+                    <div class="display">
+                        <div class="buttons">
+                            <div class="button selected">
+                                YAML
+                            </div>
+                        </div>
+                    </div>
+                </header>
+                <div id="description">
+                    <div class="definition">
+                        <div class="title">
+                            <h1>
+                                Schema Schema
+                            </h1>
+                        </div>
+                        <div class="introduction">
+                            <h2 id="introduction-overview">
+                                Overview
+                            </h2>
+                            <div class="overview">
+                                <p>Lulo is a data specification format. It allows you define schemas. With schemas, you can define the structure of your data with a collection of Algebraic Data Types. Additionally, schemas may contain constraints, sometimes called Refinement Types, on those types in order to precisely enforce the possible values of the data.</p><p>Then you can:</p><ul><li>Validate that a JSON / YAML document matches a schema.</li><li>Automatically parse a JSON / YAML document that matches a schema.Parsing is flexible -- you can map the parsed data to any data structure.</li><li>Generate HTML documentation for a schema.</li></ul><p>With Lulo you can declare your data types in schema files and use the same data in different parts of your application. The data will always be the same because the parsing is done automatically according to the types defined in the schemas.</p><p>If your application provides an open data format for interfacing with an API or creating custom scripts, then clients will be able to create their own programs and use your data by just using Lulo and the data schemas. Plus, clients can use the generated HTML documentation as a guide.</p><blockquote><p>Lulo is Defined With Lulo</p><p>Lulo can be defined using Lulo, and in fact, it is. Schemas are just documents, and Lulo parses them the same way that it parse any other document. This implies the existence of a schema schema which defines the format of all schemas.</p><p>The schema schema is hard-coded into the implementation because the schema schema is a schema, and we cannot parse a schema without the schema schema.</p></blockquote><p>Since Lulo itself is a schema, it's HTML documentation can be automatically generated -- it is self-documenting.</p>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="display">
+                    </div>
+                </div>
+                <div id="types">
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="case">
+                                Case
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="case" class="type">
+                            <div class="definition">
+                                <h3 id="case">
+                                    Case
+                                </h3>
+                                <div class="description">
+                                    <p>A case of a sum type.</p><p>A sum type is a tagged union of types. Each type in the tagged union is a case.</p><p>For example, suppose we have a Pet datatype represented with Haskell syntax:</p><pre><code>data Pet = 
+    PetDog Dog
+  | PetCat Cat
+  | PetHamster Hamster</code></pre><p>Each data constructor of <code>Pet</code> (e.g. <code>PetDog</code>, <code>PetCat</code>, ...) is a case. The only difference is that Lulo doesn't have tags. Each case is uniquely identified by the type (e.g. <code>Dog</code>, <code>Cat</code>, ...), so every case in a sum type must represent a unique type.</p>
+                                </div>
+                                <div class="fields">
+                                    <h4>
+                                        2 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        type
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#case_description">
+                                                            case_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                        <div class="yaml example selected">
+                                            <h4>
+                                                A Question
+                                            </h4>
+                                            <p>
+                                                A sum type that represents a question with three cases.
+                                            </p>
+                                            <pre><code>type: sum_type
+sum_type:
+   name: question
+   label: Question
+   description: The types of questions on a quiz.
+   cases:
+   - type: multiple_choice
+     description: A question with a set of possible answers.
+   - type: open_ended
+     description: A question with a written answer.
+   - type: matching
+     description: > 
+       A question where the user must match items on the left side 
+       to items on the left side to the right side.</pre></code>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="case_description" class="type">
+                            <div class="definition">
+                                <h3 id="case-description">
+                                    Case Description
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="code-example">
+                                Code Example
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="code_example" class="type">
+                            <div class="definition">
+                                <h3 id="code-example">
+                                    Code Example
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        5 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        language
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#code_example_language">
+                                                            code_example_language
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        case
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#code_example_case">
+                                                            code_example_case
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        code
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#code_example_code">
+                                                            code_example_code
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        title
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#code_example_title">
+                                                            code_example_title
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#code_example_description">
+                                                            code_example_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="code_example_case" class="type">
+                            <div class="definition">
+                                <h3 id="code-example-case">
+                                    Code Example Case
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="code_example_code" class="type">
+                            <div class="definition">
+                                <h3 id="code-example-code">
+                                    Code Example Code
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="code_example_description" class="type">
+                            <div class="definition">
+                                <h3 id="code-example-description">
+                                    Code Example Description
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="code_example_language" class="type">
+                            <div class="definition">
+                                <h3 id="code-example-language">
+                                    Code Example Language
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="code_example_title" class="type">
+                            <div class="definition">
+                                <h3 id="code-example-title">
+                                    Code Example Title
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="constraint">
+                                Constraint
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="constraint" class="type">
+                            <div class="definition">
+                                <h3 id="constraint">
+                                    Constraint
+                                </h3>
+                                <div class="cases">
+                                    <h4>
+                                        2 Cases
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#constraint_string_one_of">
+                                                        constraint_string_one_of
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#constraint_num_greater_than">
+                                                        constraint_num_greater_than
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_description" class="type">
+                            <div class="definition">
+                                <h3 id="constraint-description">
+                                    Constraint Description
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_label" class="type">
+                            <div class="definition">
+                                <h3 id="constraint-label">
+                                    Constraint Label
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_name" class="type">
+                            <div class="definition">
+                                <h3 id="constraint-name">
+                                    Constraint Name
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_num_greater_than" class="type">
+                            <div class="definition">
+                                <h3 id="number-greater-than-constraint">
+                                    Number Greater Than Constraint
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        4 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_name">
+                                                            constraint_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_label">
+                                                            constraint_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_description">
+                                                            constraint_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        lower_bound
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            Number
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_string_one_of" class="type">
+                            <div class="definition">
+                                <h3 id="string-membership-constraint">
+                                    String Membership Constraint
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        4 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_name">
+                                                            constraint_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_label">
+                                                            constraint_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#constraint_description">
+                                                            constraint_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        set
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint_string_one_of_value">
+                                                                constraint_string_one_of_value
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="constraint_string_one_of_value" class="type">
+                            <div class="definition">
+                                <h3 id="string-membership-constraint-value.">
+                                    String Membership Constraint Value.
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        2 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        value
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            String
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            String
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="field">
+                                Field
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="field" class="type">
+                            <div class="definition">
+                                <h3 id="field">
+                                    Field
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        5 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#field_name">
+                                                            field_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        presence
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#field_presence">
+                                                            field_presence
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#field_description">
+                                                            field_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        type
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#value_type">
+                                                            value_type
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        default_value
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#field_default_value">
+                                                            field_default_value
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="field_default_value" class="type">
+                            <div class="definition">
+                                <h3 id="field-default-value">
+                                    Field Default Value
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="field_description" class="type">
+                            <div class="definition">
+                                <h3 id="field-description">
+                                    Field Description
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="field_name" class="type">
+                            <div class="definition">
+                                <h3 id="field-name">
+                                    Field Name
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="field_presence" class="type">
+                            <div class="definition">
+                                <h3 id="field-presence">
+                                    Field Presence
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="kind">
+                                Kind
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="custom_coll_type" class="type">
+                            <div class="definition">
+                                <h3 id="custom-collection-type">
+                                    Custom Collection Type
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            type_name
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="custom_type" class="type">
+                            <div class="definition">
+                                <h3 id="custom-type">
+                                    Custom Type
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            type_name
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="prim_coll_type" class="type">
+                            <div class="definition">
+                                <h3 id="primitive-collection-type">
+                                    Primitive Collection Type
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            prim_value_type
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="prim_type" class="type">
+                            <div class="definition">
+                                <h3 id="primitive-type">
+                                    Primitive Type
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            prim_value_type
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="prim_value_type" class="type">
+                            <div class="definition">
+                                <h3 id="primivite-value-type">
+                                    Primivite Value Type
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="value_type" class="type">
+                            <div class="definition">
+                                <h3 id="kind">
+                                    Kind
+                                </h3>
+                                <div class="cases">
+                                    <h4>
+                                        4 Cases
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#prim_type">
+                                                        prim_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#prim_coll_type">
+                                                        prim_coll_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#custom_type">
+                                                        custom_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#custom_coll_type">
+                                                        custom_coll_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="metadata">
+                                Metadata
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="schema_author" class="type">
+                            <div class="definition">
+                                <h3 id="author">
+                                    Author
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        1 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            String
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schema_metadata" class="type">
+                            <div class="definition">
+                                <h3 id="metadata">
+                                    Metadata
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        2 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#schema_name">
+                                                            schema_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        authors
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#schema_author">
+                                                                schema_author
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schema_name" class="type">
+                            <div class="definition">
+                                <h3 id="name">
+                                    Name
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="schema">
+                                Schema
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="schema" class="type">
+                            <div class="definition">
+                                <h3 id="the-schema.">
+                                    The schema.
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        6 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        version
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#schema_version">
+                                                            schema_version
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        metadata
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#schema_metadata">
+                                                            schema_metadata
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#schema_description">
+                                                            schema_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        root_type
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        types
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#schema_type">
+                                                                schema_type
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        constraints
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint">
+                                                                constraint
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schema_description" class="type">
+                            <div class="definition">
+                                <h3 id="description">
+                                    Description
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        1 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        overview
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            String
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schema_version" class="type">
+                            <div class="definition">
+                                <h3 id="version">
+                                    Version
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="type">
+                                Type
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="primitive_type" class="type">
+                            <div class="definition">
+                                <h3 id="wrapper-type">
+                                    Wrapper Type
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        7 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_label">
+                                                            type_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_description">
+                                                            type_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        group
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_group">
+                                                            type_group
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        constraints
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint_name">
+                                                                constraint_name
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        base_type
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#base_type">
+                                                            base_type
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        code_examples
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#code_example">
+                                                                code_example
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="product_type" class="type">
+                            <div class="definition">
+                                <h3 id="product-type">
+                                    Product Type
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        7 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_label">
+                                                            type_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_description">
+                                                            type_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        group
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_group">
+                                                            type_group
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        constraints
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint_name">
+                                                                constraint_name
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        fields
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#field">
+                                                                field
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        code_examples
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#code_example">
+                                                                code_example
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="schema_type" class="type">
+                            <div class="definition">
+                                <h3 id="type">
+                                    Type
+                                </h3>
+                                <div class="cases">
+                                    <h4>
+                                        4 Cases
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#product_type">
+                                                        product_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#sum_type">
+                                                        sum_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#primitive_type">
+                                                        primitive_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#symbol_type">
+                                                        symbol_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="sum_type" class="type">
+                            <div class="definition">
+                                <h3 id="sum-type">
+                                    Sum Type
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        7 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_label">
+                                                            type_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_description">
+                                                            type_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        group
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_group">
+                                                            type_group
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        constraints
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint_name">
+                                                                constraint_name
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        cases
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#case">
+                                                                case
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        code_examples
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#code_example">
+                                                                code_example
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="symbol_type" class="type">
+                            <div class="definition">
+                                <h3 id="symbol-type">
+                                    Symbol Type
+                                </h3>
+                                <div class="fields">
+                                    <h4>
+                                        7 Fields
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        name
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_name">
+                                                            type_name
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        label
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_label">
+                                                            type_label
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        description
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_description">
+                                                            type_description
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        group
+                                                    </div>
+                                                    <div class="type">
+                                                        <a href="#type_group">
+                                                            type_group
+                                                        </a>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        constraints
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#constraint_name">
+                                                                constraint_name
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <header>
+                                                    <div class="name">
+                                                        symbol
+                                                    </div>
+                                                    <div class="type">
+                                                        <span class="primitive">
+                                                            String
+                                                        </span>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="field">
+                                                <div class="presence">
+                                                    optional
+                                                </div>
+                                                <header>
+                                                    <div class="name">
+                                                        code_examples
+                                                    </div>
+                                                    <div class="type">
+                                                        <div>
+                                                            <span>
+                                                                list of
+                                                            </span>
+                                                            <a href="#code_example">
+                                                                code_example
+                                                            </a>
+                                                        </div>
+                                                    </div>
+                                                </header>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="type_description" class="type">
+                            <div class="definition">
+                                <h3 id="type-description">
+                                    Type Description
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="type_group" class="type">
+                            <div class="definition">
+                                <h3 id="type-group">
+                                    Type Group
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="type_label" class="type">
+                            <div class="definition">
+                                <h3 id="type-label">
+                                    Type Label
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div id="type_name" class="type">
+                            <div class="definition">
+                                <h3 id="type-name">
+                                    Type Name
+                                </h3>
+                                <div class="synonym">
+                                    <h4>
+                                        <span class="extends">
+                                            extends
+                                        </span>
+                                        <span class="base-type">
+                                            String
+                                        </span>
+                                    </h4>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="section-header">
+                        <div class="definition">
+                            <h2 id="wrappable-type">
+                                Wrappable Type
+                            </h2>
+                        </div>
+                        <div class="display">
+                            
+                        </div>
+                    </div>
+                    <div class="group">
+                        <div id="base_type" class="type">
+                            <div class="definition">
+                                <h3 id="wrappable-type">
+                                    Wrappable Type
+                                </h3>
+                                <div class="cases">
+                                    <h4>
+                                        2 Cases
+                                    </h4>
+                                    <ul>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#prim_type">
+                                                        prim_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                        <li>
+                                            <div class="case">
+                                                <div class="type">
+                                                    <a href="#custom_type">
+                                                        custom_type
+                                                    </a>
+                                                </div>
+                                            </div>
+                                        </li>
+                                    </ul>
+                                </div>
+                            </div>
+                            <div class="display">
+                                <div class="examples">
+                                    <h3>
+                                        Examples
+                                    </h3>
+                                    <div class="use_case">
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <script src="schema.js">
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function(event) {     console.log('this works');    document.querySelector('.section-header.types').addEventListener('click', function(e) {         console.log('types header clicked');         var indexTypesElement = document.querySelector('#index-types');            if (indexTypesElement.classList.contains('open')) {             indexTypesElement.classList.remove('open');             indexTypesElement.classList.add('closed');             document.querySelector('.section-header.types .caret').innerHTML = '&#x25B6';         } else {             indexTypesElement.classList.remove('closed');             indexTypesElement.classList.add('open');             document.querySelector('.section-header.types .caret').innerHTML = '&#x25BC';         }    });    document.querySelector('.section-header.introduction').addEventListener('click', function(e) {         var indexTypesElement = document.querySelector('#introduction-sections');            if (indexTypesElement.classList.contains('open')) {             indexTypesElement.classList.remove('open');             indexTypesElement.classList.add('closed');             document.querySelector('.section-header.introduction .caret').innerHTML = '&#x25B6';         } else {             indexTypesElement.classList.remove('closed');             indexTypesElement.classList.add('open');             document.querySelector('.section-header.introduction .caret').innerHTML = '&#x25BC';         }    });    document.querySelector('.section-header.constraints').addEventListener('click', function(e) {         var indexTypesElement = document.querySelector('#index-constraints');            if (indexTypesElement.classList.contains('open')) {             indexTypesElement.classList.remove('open');             indexTypesElement.classList.add('closed');             document.querySelector('.section-header.constraints .caret').innerHTML = '&#x25B6';         } else {             indexTypesElement.classList.remove('closed');             indexTypesElement.classList.add('open');             document.querySelector('.section-header.constraints .caret').innerHTML = '&#x25BC';         }    });});
+        </script>
+    </body>
+</html>
