@@ -45,13 +45,11 @@ clients.
 Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
 documents, and Lulo parses them the same way that it parse any other document. 
 
-This implies the existence of a **schema schema** which defines 
+This implies the existence of a *schema schema* which defines 
 the format of all schemas.
 
 The schema schema is hard-coded into the implementation because the 
 schema schema is a schema, and we cannot parse a schema without the schema schema.
-
-:confused:
 
 Since Lulo itself is a schema, it's HTML documentation can be
 automatically generated -- it is self-documenting.
@@ -86,30 +84,34 @@ TODO
 
 ## Getting Started
 
-Let's get started with an example. We are going to define some basic
-data types for software that manages quizzes or tests. Our software
-will have both iOS and Android apps as well as a web application, so
-users can use our application however they like. We also have a server
-component that provides functionality for sharing quizzes among the users.
+Let's get started by using Lulo to help manage data for a hypothetical 
+quiz application. The application will have separate apps for iOS,
+Android, and the web so that users can take and create quizzes on the
+platform that's most convenient for them. In addition, there will be
+a web server that facilitates sharing quizzes and other quiz-related 
+content.
 
-With Lulo, we can define our data in one place -- in a collection of
-schema files -- and guarantee that each component in our quiz platform
-interprets that data in the exact same way. This works because Lulo
-can parse JSON or YAML documents based on the schema file, including
-with specific constraints such as this value must be *greater than 0*.
-Therefore, each component will be using the exact same data. This
-prevents the two classes of errors that occur often at component 
-boundaries when doing common tasks such as reading data from a file, 
-parsing an API request body, or sending data to another component:
- 
+Our quiz application actually consists of four separate applications
+even though they all have roughly the same business logic and data.
+Lulo doesn't help us with the logic and procedures, but it is useful 
+for managing the data.
+Normally, you would have to (1) write code to define, parse, and encode
+data for each application and then (2) maintain those four separate code
+instances carefully, so that they don't diverge and cause errors. With
+Lulo, we can define the data in one place, which saves us time now by
+reducing the code we need to write and saves us problems in the
+future, by ensuring a consistent view of data for all of our applications.
+
+In particular, Lulo reduces the occurrence of two classes of errors
+that commonly occur at application boundaries during common tasks such
+as reading data from a file, parsing an API request body, or sending 
+data to another component:
+
   1. **Parsing Errors** that result from data being interpreted
      incorrectly e.g. the parser of one component expects a field with
      the wrong name.
   2. **Encoding Errors** that occur when data is saved in the wrong
      format e.g. a field is named incorrectly
-
-Additionally, if the data format is changed, each component only 
-needs the updated schema. No code modification is necessary. 
 
 ### 1. Defining a Schema
 
