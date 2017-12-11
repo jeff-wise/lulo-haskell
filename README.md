@@ -15,42 +15,46 @@
 
 ------------------------------------------------------------------------
 
-Lulo is a data specification format. It allows you define *schemas*. With schemas, 
-you can define the structure of your data with a collection of 
-**Algebraic Data Types**. Additionally, schemas may contain constraints, 
-sometimes called **Refinement Types**, on those types in 
-order to precisely enforce the possible values of the data.
+Lulo is a format for defining data types that may be shared between
+between multiple programs.
+
+You specify the structure of your data in *schema files* using 
+**Algebraic Data Types** and **Refinement Types**.
 
 Then you can:
 
-  * Validate that a JSON / YAML document matches a schema.
+  * Validate that a JSON / YAML document matches a schema (has the
+      same structure / permitted values).
   * Automatically parse a JSON / YAML document that matches a schema.
     Parsing is flexible -- you can map the parsed data to any data structure.
   * Generate HTML documentation for a schema.
 
-With Lulo you can declare your data types in schema files and use the
-same data in different parts of your application. The data will always
-be the same because the parsing is done automatically according to the
-types defined in the schemas. 
+Because of the validation and automatic parsing that Lulo provides,
+you can declare your data format in one location (a set of schema
+files) and ensure that it is interpreted correctly in all locations.
 
-If your application provides an open
-data format for interfacing with an API or creating custom scripts, then 
-clients will be able to create their own programs and use your data by 
-just using Lulo and the data schemas. Plus, clients can use the 
-generated HTML documentation as a guide.
+Additionally, if your application allows customers to send data
+through your API or create custom scripts, you only need to provide
+the relevant schema files so that they can validate or generate
+correct data to interact with your application. As a bonus, the schema
+files come with automatically generated HTML documentation for your
+clients.
 
-> #### Lulo is Defined With Lulo
->
-> Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
-> documents, and Lulo parses them the same way that it parse any other document. 
-> This implies the existence of a **schema schema** which defines 
-> the format of all schemas.
->
-> The schema schema is hard-coded into the implementation because the 
-> schema schema is a schema, and we cannot parse a schema without the schema schema.
->
-> Since Lulo itself is a schema, it's HTML documentation can be
-> automatically generated -- it is self-documenting.
+#### Lulo is Defined With Lulo
+
+Lulo can be defined using Lulo, and in fact, it is. Schemas are just 
+documents, and Lulo parses them the same way that it parse any other document. 
+
+This implies the existence of a **schema schema** which defines 
+the format of all schemas.
+
+The schema schema is hard-coded into the implementation because the 
+schema schema is a schema, and we cannot parse a schema without the schema schema.
+
+:confused:
+
+Since Lulo itself is a schema, it's HTML documentation can be
+automatically generated -- it is self-documenting.
 
 ### Contents
 
@@ -58,11 +62,11 @@ generated HTML documentation as a guide.
   - [Library](#library)
   - [Executable](#executable)
 - [Getting Started](#getting-started)
-  - [Defining a Schema](#defining-a-schema)
-  - [Creating Documents](#creating-documents)
-  - [Parsing Documents](#parsing-documents)
-  - [Encoding Documents](#encoding-documents)
-  - [Generate HTML Documentation](#generate-html-documentation)
+    1. [Defining a Schema](#defining-a-schema)
+    2. [Creating Documents](#creating-documents)
+    3. [Parsing Documents](#parsing-documents)
+    4. [Encoding Documents](#encoding-documents)
+    5. [Generate HTML Documentation](#generate-html-documentation)
 - [Schemas](#schemas)
   - [Types](#types)
     - [Primitives](#primitives)
