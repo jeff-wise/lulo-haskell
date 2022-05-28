@@ -13,6 +13,9 @@ View the original project :arrow_down:
 
 ------------------------------------------------------------------------
 
+<br/>
+<br/>
+
 <div align="center">
   <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="50%" />
 </div>
