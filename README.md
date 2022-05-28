@@ -11,8 +11,6 @@ component of a programming language,
 
 **View the original project** :arrow_down:
 
-------------------------------------------------------------------------
-
 <br/>
 <br/>
 <br/>
