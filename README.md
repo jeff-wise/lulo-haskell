@@ -15,6 +15,8 @@ component of a programming language,
 <br/>
 <br/>
 <br/>
+<br/>
+<br/>
 
 <div align="center">
   <img src="https://raw.githubusercontent.com/jeff-wise/lulo-haskell/master/docs/assets/logo.png" width="50%" />
