@@ -1,5 +1,5 @@
 
-## Deprectated Side Project
+## Deprecated Side-Project
 
 This repo was an old side project for an IDL (interface definition
 language) and data format designed to support the needs of the
@@ -9,7 +9,7 @@ a larger project which aims to be an indepedent data language as one
 component of a programming language,
 [Elea](https://github.com/elealang).
 
-*View the original project* :arrow_down:
+**View the original project** :arrow_down:
 
 ------------------------------------------------------------------------
 
