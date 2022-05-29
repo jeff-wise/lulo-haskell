@@ -1,7 +1,7 @@
 
-## :arrow_heading_down: Deprecated Side-Project
+## :speech_balloon: Deprecated Side-Project
 
-:speech_balloon: This repo was an old side project for an IDL
+This repo was an old side project for an IDL
 (interface definition language) and data format designed to support
 the needs of the
 [TaleTable](https://github.com/jeff-wise/taletable-legacy) project.
