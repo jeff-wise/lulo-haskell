@@ -1,5 +1,5 @@
 
-## Deprecated Side-Project
+## :arrow_heading_down: Deprecated Side-Project
 
 :speech_balloon: This repo was an old side project for an IDL
 (interface definition language) and data format designed to support
@@ -10,7 +10,7 @@ a larger project which aims to be an indepedent data language as one
 component of a programming language,
 [Elea](https://github.com/elealang).
 
-**View the original README below** :arrow_down:
+**View the original README below** :arrow_heading_down:
 
 <br/>
 <br/>
