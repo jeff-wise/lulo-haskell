@@ -1,15 +1,16 @@
 
 ## Deprecated Side-Project
 
-This repo was an old side project for an IDL (interface definition
-language) and data format designed to support the needs of the
+:speech_balloon: This repo was an old side project for an IDL
+(interface definition language) and data format designed to support
+the needs of the
 [TaleTable](https://github.com/jeff-wise/taletable-legacy) project.
 I've brought a lot of insights and lessons-learned gained here into
 a larger project which aims to be an indepedent data language as one
 component of a programming language,
 [Elea](https://github.com/elealang).
 
-**View the original project** :arrow_down:
+**View the original README below** :arrow_down:
 
 <br/>
 <br/>
