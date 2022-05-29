@@ -1,14 +1,23 @@
 
 ## :speech_balloon: Deprecated Side-Project
 
-This repo was an old side project for an IDL
-(interface definition language) and data format designed to support
-the needs of the
-[TaleTable](https://github.com/jeff-wise/taletable-legacy) project.
-I've brought a lot of insights and lessons-learned gained here into
-a larger project which aims to be an indepedent data language as one
-component of a programming language,
-[Elea](https://github.com/elealang).
+This repo was an attempt at designing a universal IDL (Interface
+Description Language) and data format with influences from the
+function programming paradigm. It was created for use with my other
+project, [TaleTable](https://github.com/jeff-wise/taletable-legacy),
+in order to manage large amounts of external data definitions and
+configuration. Since then, I've brought a lot of insights and
+lessons-learned from this project into
+[Elea](https://github.com/elealang), which aims to be a different
+kind of programming language. Due to its unique type system it can
+function as an IDL and universal data format, expanding the scope of
+Lulo into use-cases that range from serialization and schema
+definitions to data engineering and application specifications.
+
+This is the canonical implementation which was done in Haskell.
+There is another implementation in
+[Kotlin](https://github.com/jeff-wise/lulo-kotlin) that was used
+with the Android [application](https://github.com/jeff-wise/taletable-legacy).
 
 **View the original README below** :arrow_heading_down:
 
