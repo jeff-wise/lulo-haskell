@@ -10,9 +10,10 @@ configuration. Since then, I've brought a lot of insights and
 lessons-learned from this project into
 [Elea](https://github.com/elealang), which aims to be a different
 kind of programming language. Due to its unique type system it can
-function as an IDL and universal data format, expanding the scope of
-Lulo into use-cases that range from serialization and schema
-definitions to data engineering and application specifications.
+function as both an IDL and data format, expanding the
+scope of Lulo into use-cases that range from serialization and
+schema definitions to data engineering, project management and even
+application design.
 
 This is the canonical implementation which was done in Haskell.
 There is another implementation in
